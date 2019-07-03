@@ -1,16 +1,23 @@
 <template>
   <div>
-    <div class="raid-member disable-select"
+    <div class="raid-member disable-select outerHpBar"
          :class="{targeted: isTargeted}"
-         :style="getHealthPointStyle"
+
     >
-      <p>{{ healthPoints }} / {{ maxHealth }}</p>
+      <app-health-bar
+        :health-points="healthPoints"
+        :max-health="maxHealth"
+        :is-alive="isAlive"
+      >
+      </app-health-bar>
     </div>
+
   </div>
 </template>
 
 <script>
   import {EventBus} from "./main";
+  import HealthBar from "./HealthBar";
 
   export default {
     props: {
@@ -29,47 +36,30 @@
       maxHealth: {
         type: Number,
         required: true
+      },
+      isAlive: {
+        type: Boolean,
+        required: true
       }
 
     },
     data() {
-      return {
-
-      }
+      return {}
     },
+    components: {'app-health-bar': HealthBar},
+
     computed: {
-      getHealthPointStyle(){
-        if(this.healthPoints > 75){
-          return {
-            'background-color': 'green'
-          };
-        }
-        else if(this.healthPoints > 50){
-          return {
-            'background-color': 'lightgreen'
-          };
-        }
-        else if(this.healthPoints > 25){
-          return {
-            'background-color': 'yellow'
-          };
-        }
-        else if(this.healthPoints > 0){
-          return {
-            'background-color': 'red'
-          };
-        }
-      }
+
     },
     methods: {
-      getTargeted(){
+      getTargeted() {
         //return this.isTargeted;
       },
-      setTargeted(){
+      setTargeted() {
         //this.isTargeted = !this.isTargeted;
       }
     },
-    created(){
+    created() {
       EventBus.$on('setTarget', (event) => {
         console.log(event);
 
@@ -80,23 +70,13 @@
 </script>
 
 <style>
+
   .raid-member {
     width: 100px;
     height: 50px;
     border: 1px solid black;
     float: left;
     margin-left: 1px;
-    text-align: center;
-  }
-  .targeted{
-    border: 1px solid red;
-  }
-
-  .mouseOverTarget{
-    border: 1px dashed yellow;
-  }
-  .health{
-    background-color: green;
   }
 
   .disable-select {
