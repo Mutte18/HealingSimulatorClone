@@ -79,6 +79,10 @@
     margin-left: 1px;
   }
 
+  .targeted {
+    border: solid red 1px;
+  }
+
   .disable-select {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */

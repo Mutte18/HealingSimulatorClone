@@ -87,5 +87,6 @@
     width: inherit;
     position: relative;
     height: 50px;
+    transition: width 500ms;
   }
 </style>

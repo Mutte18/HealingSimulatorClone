@@ -1,54 +1,122 @@
 <template>
   <div>
+    <app-boss
+      :health-points="bossHp"
+      :max-health="10000"
+    ></app-boss>
     <div class="raid-frame">
-      <div v-for="(raidMember, index) in raidMembers">
-        <raid-member
-          @click.native="setTarget(index)"
-          @mouseover.native="setMouseOverTarget(index)"
-          @mouseleave.native="clearMouseOverTarget"
-          :id="raidMembers[index].id"
-          :is-targeted="raidMembers[index].isTargeted"
-          :health-points="raidMembers[index].healthPoints"
-          :max-health="raidMembers[index].maxHealth"
-          :is-alive="raidMembers[index].isAlive"
-        >
-        </raid-member>
-
+      <div class=inner-raid-frame>
+        <div v-for="(raidMember, index) in raidMembers">
+          <app-raid-member
+            @click.native="setTarget(index)"
+            @mouseover.native="setMouseOverTarget(index)"
+            @mouseleave.native="clearMouseOverTarget"
+            :id="raidMembers[index].getId()"
+            :is-targeted="raidMembers[index].getIsTargeted()"
+            :health-points="raidMembers[index].getHealthPoints()"
+            :max-health="raidMembers[index].getMaxHealth()"
+            :is-alive="raidMembers[index].getIsAlive()"
+          >
+          </app-raid-member>
+        </div>
+      </div>
+      <div v-if="mouseOverTarget">
+        <app-raid-member
+          :id="mouseOverTarget.getId()"
+          :is-targeted="false"
+          :health-points="mouseOverTarget.getHealthPoints()"
+          :max-health="mouseOverTarget.getMaxHealth()"
+          :is-alive="mouseOverTarget.getIsAlive()">
+        </app-raid-member>
       </div>
     </div>
-    <br>
-    <br>
-    <div v-if="mouseOverTarget">
-      <raid-member
-        :id="mouseOverTarget.id"
-        :is-targeted="false"
-        :health-points="mouseOverTarget.healthPoints"
-        :max-health="mouseOverTarget.maxHealth"
-        :is-alive="mouseOverTarget.isAlive"></raid-member>
+    <div><!--v-show="isCasting"-->
+      <app-cast-bar></app-cast-bar>
+    </div>
+    <app-mana-bar
+      :mana-points="manaPoints"
+      :max-mana="maxMana">
+    </app-mana-bar>
+    <hr>
+    <div class="spellbar">
+      <div v-for="(spell, index) in spellList">
+      <app-spell
+        :cooldown-time="spell.cooldown"
+        :spell-icon="spell.icon"
+        :spell-name="spell.name"
+        :spell-bar-index="index + 1">
+      </app-spell>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-  import RaidMember from './RaidMember.vue'
+  import RaidMember from './RaidMember.vue';
   import {EventBus} from "./main";
+  import RaidMemberModel from './RaidMemberModel';
+  import ManaBar from "./ManaBar.vue";
+  import Boss from "./Boss";
+  import Spell from "./Spell"
+  import CastBar from "./CastBar"
 
   export default {
     data() {
       return {
-        raidSize: 15,
+        bossHp: 10000,
+        raidSize: 20,
         raidMembers: [],
         mouseOverTarget: null,
-        clickedTarget: null
+        clickedTarget: null,
+        isCasting: false,
+        manaPoints: 1000,
+        maxMana: 1000,
+        manaRegenAmount: 1,
+        manaRegenRate: 500, //milliseconds
+        spellList: [
+          {
+            name: 'Heal',
+            manaCost: 50,
+            icon: 'heal.png',
+            cooldown: 1,
+            castTime: 2000,
+          },
+          {
+            name: 'Flash Heal',
+            manaCost: 50,
+            icon: 'flash_heal.png',
+            cooldown: 1
+          },
+          {
+            name: 'Circle of Healing',
+            manaCost: 50,
+            icon: 'circle_of_healing.png',
+            cooldown: 1
+          },
+          {
+            name: 'Renew',
+            manaCost: 50,
+            icon: 'renew.png',
+            cooldown: 1
+          },
+          {
+            name: 'Dispel',
+            manaCost: 50,
+            icon: 'dispel.png',
+            cooldown: 1
+          }
+        ]
       }
     },
+
+
+
     methods: {
       setTarget(index) {
         this.clearTargets();
-        this.raidMembers[index].isTargeted = !this.raidMembers[index].isTargeted;
+        this.raidMembers[index].setIsTargeted(true);
         this.clickedTarget = this.raidMembers[index];
         this.reduceHealth(index);
-        //EventBus.$emit('setTarget', event.target);
       },
       setMouseOverTarget(index) {
         this.mouseOverTarget = this.raidMembers[index];
@@ -58,97 +126,117 @@
       },
       clearTargets() {
         this.raidMembers.forEach((raidMember) => {
-          raidMember.isTargeted = false;
+          raidMember.setIsTargeted(false);
         })
       },
       reduceHealth(index) {
-        this.raidMembers[index].healthPoints -= 15;
-        if (this.raidMembers[index].healthPoints <= 0) {
-          this.raidMembers[index].healthPoints = 0;
-        }
+        this.raidMembers[index].reduceHealthPoints(15);
       },
 
       createRaiders() {
         for (let i = 0; i < this.raidSize; i++) {
-          this.raidMembers.push({
+          this.raidMembers.push(new RaidMemberModel({
             id: i,
-            isTargeted: false,
             healthPoints: 100,
             maxHealth: 100,
-            isAlive: true
-          })
+            isAlive: true,
+            isTargeted: false
+          }));
         }
       },
-      castHeal(){
+      castHeal() {
         let target = null;
-        if(this.mouseOverTarget)
-        {
+        if (this.mouseOverTarget) {
           target = this.mouseOverTarget;
-        }
-        else if(this.clickedTarget){
+        } else if (this.clickedTarget) {
           target = this.clickedTarget;
         }
-        if(target && this.getIsAlive(target)){
-          target.healthPoints += 10;
-          if(target.healthPoints > target.maxHealth){
-            target.healthPoints = target.maxHealth;
-          }
-        }
-        else{
+        if (target && target.getIsAlive()) {
+          target.increaseHealthPoints(10);
+          this.useMana(50);
+          this.castSpell(this.spellList[0]);
+        } else {
           console.log("No target")
         }
+
       },
-      castAoeHeal(){
+      castAoeHeal() {
         this.raidMembers.forEach((raidMember) => {
-          if(this.getIsAlive(raidMember)) {
-            raidMember.healthPoints += 20;
-            if (raidMember.healthPoints > raidMember.maxHealth) {
-              raidMember.healthPoints = raidMember.maxHealth;
-            }
+          if (raidMember.getIsAlive()) {
+            raidMember.increaseHealthPoints(20);
           }
-        })
+        });
+        this.useMana(150);
       },
-      getIsAlive(raidMember){
-        return raidMember.isAlive
-      },
-      doDamage(raidMember, damage){
-        raidMember.healthPoints -= damage;
-        if(raidMember.healthPoints <= 0){
-          raidMember.healthPoints = 0;
-          raidMember.isAlive = false;
+      useMana(manaCost) {
+        this.manaPoints -= manaCost;
+        if (this.manaPoints <= 0) {
+          this.manaPoints = 0;
         }
       },
-      inflictPeriodicDamage(interval){
+      doDamage(raidMember, damage) {
+        raidMember.reduceHealthPoints(damage);
+      },
+      inflictPeriodicDamage(interval) {
         setInterval(() => {
           this.raidMembers.forEach((raidMember) => {
             this.doDamage(raidMember, this.getRandomDamage())
           })
         }, interval)
       },
-      getRandomDamage(){
+      restorePeriodicMana(manaRegenRate) {
+        setInterval(() => {
+          this.regenMana(this.manaRegenAmount)
+          this.bossHp -= 1;
+        }, manaRegenRate)
+      },
+      getRandomDamage() {
         return Math.floor(Math.random() * Math.floor(20));
       },
-      setUpKeyListener(){
+      setUpKeyListener() {
         window.addEventListener('keydown', (event) => {
           this.checkKeyPressed(event);
         })
       },
-      checkKeyPressed(event){
-        if(event.key == '1'){
+      checkKeyPressed(event) {
+        if (event.key == '1') {
           this.castHeal();
-        }
-        else if(event.key == '2'){
+        } else if (event.key == '2') {
           this.castAoeHeal();
         }
-      }
+      },
+      regenMana(manaAmount) {
+        this.manaPoints += manaAmount;
+        if (this.manaPoints > this.maxMana) {
+          this.manaPoints = this.maxMana;
+        }
+      },
+      castSpell(spell){
+        if(spell.castTime){
+          console.log(spell);
+          EventBus.$emit('startSpellCast', spell);
+          console.log('Sent event to cast');
+          this.isCasting = true;
+        }
+      },
     },
+
     created() {
       this.createRaiders();
       this.setUpKeyListener();
       this.inflictPeriodicDamage(1000);
+      this.restorePeriodicMana(this.manaRegenRate);
+      EventBus.$on('spellCastFinished', () => {
+        console.log('BLEV KLAR');
+        this.isCasting = false;
+      })
     },
     components: {
-      'raid-member': RaidMember,
+      'app-raid-member': RaidMember,
+      'app-mana-bar': ManaBar,
+      'app-boss': Boss,
+      'app-spell': Spell,
+      'app-cast-bar': CastBar
     }
   }
 
@@ -158,7 +246,24 @@
 <style>
   .raid-frame {
     border: 1px solid black;
-    height: 200px;
+    height: 250px;
     width: 550px;
+    margin-left: 30%;
+    margin-top: 5%;
+  }
+
+  .inner-raid-frame {
+    margin-left: 17px;
+    margin-top: 20px;
+    width: inherit;
+    height: inherit;
+  }
+
+  .spellbar {
+    margin-left: 30%;
+    width: 550px;
+    border: solid 1px black;
+    background-color: orange;
+    height: 100px;
   }
 </style>
