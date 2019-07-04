@@ -16,6 +16,8 @@ Spell casting:
   Cast bar:
   - There should be a cast bar for spells with a cast time. Once the cast bar is filled up the spell is cast.
   - There are spells with different lengths on the cast bar
+  - The cast bar should not be shown when not casting.
+  - The cast bar should take in cast time as argument to how fast it should fill
   Spells:
   - Quick heal:
       This heal should be fast to cast, but quite expensive. It should be used for sort of oh shit moments
@@ -49,3 +51,16 @@ Progression:
 
 Fun side-ideas:
   Healing meter:
+
+Components:
+  * Cast bar (Should accept a cast time, spell name)
+  * Health bar (Could possibly be used for both boss and players, with different
+  values send in)
+  * Mana bar
+  * Raid member
+  * Raid boss
+  * Spell bar
+  * Spell icon
+  * Raid frame
+  * Logic (should this be a component?)
+
