@@ -20,7 +20,7 @@
           </app-raid-member>
         </div>
       </div>
-      <div v-if="mouseOverTarget">
+      <!--<div v-if="mouseOverTarget">
         <app-raid-member
           :id="mouseOverTarget.getId()"
           :is-targeted="false"
@@ -29,9 +29,13 @@
           :is-alive="mouseOverTarget.getIsAlive()">
         </app-raid-member>
       </div>
+      -->
     </div>
-    <div><!--v-show="isCasting"-->
+    <div style="min-height: 60px;">
+    <div v-show="isCasting">
       <app-cast-bar></app-cast-bar>
+    </div>
+
     </div>
     <app-mana-bar
       :mana-points="manaPoints"
@@ -59,6 +63,7 @@
   import Boss from "./Boss";
   import Spell from "./Spell"
   import CastBar from "./CastBar"
+  import {SpellLogic} from './SpellLogic.js';
 
   export default {
     data() {
@@ -80,30 +85,43 @@
             icon: 'heal.png',
             cooldown: 1,
             castTime: 2000,
+            healAmount: 25
           },
           {
             name: 'Flash Heal',
-            manaCost: 50,
+            manaCost: 90,
             icon: 'flash_heal.png',
-            cooldown: 1
+            cooldown: 1,
+            castTime: 20000,
+            healAmount: 45
           },
           {
             name: 'Circle of Healing',
             manaCost: 50,
             icon: 'circle_of_healing.png',
+            castTime: 0,
+            healAmount: 150,
             cooldown: 1
           },
           {
             name: 'Renew',
             manaCost: 50,
             icon: 'renew.png',
+            healAmount: -50,
             cooldown: 1
           },
           {
             name: 'Dispel',
             manaCost: 50,
             icon: 'dispel.png',
+            healAmount: 10,
             cooldown: 1
+          },
+          {
+            name: 'Holy Shock',
+            manaCost: 50,
+            icon: 'dispel.png',
+            cooldown: 5
           }
         ]
       }
@@ -144,21 +162,25 @@
           }));
         }
       },
-      castHeal() {
+      castHeal(spellObject) {
         let target = null;
         if (this.mouseOverTarget) {
           target = this.mouseOverTarget;
         } else if (this.clickedTarget) {
           target = this.clickedTarget;
         }
-        if (target && target.getIsAlive()) {
-          target.increaseHealthPoints(10);
-          this.useMana(50);
-          this.castSpell(this.spellList[0]);
+        if (target && target.getIsAlive() && !this.isCasting && this.checkIfEnoughManaForCast(spellObject)) {
+          this.useMana(spellObject.manaCost);
+          this.isCasting = true;
+          SpellLogic.castSpell(spellObject, target);
+          //this.castSpell(this.spellList[1], target);
         } else {
           console.log("No target")
         }
 
+      },
+      checkIfEnoughManaForCast(spellObject){
+        return this.manaPoints - spellObject.manaCost > 0;
       },
       castAoeHeal() {
         this.raidMembers.forEach((raidMember) => {
@@ -200,9 +222,20 @@
       },
       checkKeyPressed(event) {
         if (event.key == '1') {
-          this.castHeal();
+          this.castHeal(this.spellList[0]);
         } else if (event.key == '2') {
-          this.castAoeHeal();
+          this.castHeal(this.spellList[1]);
+        }else if (event.key == '3') {
+          this.castHeal(this.spellList[2]);
+        }else if (event.key == '4') {
+          this.castHeal(this.spellList[3]);
+        }else if (event.key == '5') {
+          this.castHeal(this.spellList[4]);
+        }else if (event.key == '6') {
+          this.castHeal(this.spellList[5]);
+        }
+        else if(event.key == 'x'){
+          this.resetGame();
         }
       },
       regenMana(manaAmount) {
@@ -211,25 +244,28 @@
           this.manaPoints = this.maxMana;
         }
       },
-      castSpell(spell){
-        if(spell.castTime){
-          console.log(spell);
-          EventBus.$emit('startSpellCast', spell);
-          console.log('Sent event to cast');
-          this.isCasting = true;
-        }
+      finishSpellCast(){
+        this.isCasting = false;
       },
+      resetGame(){
+        this.raidMembers.forEach((raidMember) => {
+          raidMember.setIsAlive(true);
+          raidMember.setHealthPoints(raidMember.getMaxHealth());
+          this.manaPoints = this.maxMana;
+        })
+      }
     },
+
+
 
     created() {
       this.createRaiders();
       this.setUpKeyListener();
       this.inflictPeriodicDamage(1000);
       this.restorePeriodicMana(this.manaRegenRate);
-      EventBus.$on('spellCastFinished', () => {
-        console.log('BLEV KLAR');
-        this.isCasting = false;
-      })
+      EventBus.$on('spellCastFinish', () => {
+        this.finishSpellCast();
+      });
     },
     components: {
       'app-raid-member': RaidMember,

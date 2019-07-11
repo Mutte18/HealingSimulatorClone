@@ -49,6 +49,7 @@
     width: 75%;
     height: 50px;
     margin-left: 15%;
+    border: solid 1px black;
   }
 
   .healthBarText{

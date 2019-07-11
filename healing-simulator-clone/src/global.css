@@ -1,0 +1,19 @@
+.outerCastBar {
+  width: 550px;
+  height: 50px;
+  margin-left: 30%;
+  border: black solid 1px;
+}
+
+.castBarText {
+  position: relative;
+  text-align: center;
+  bottom: 35px;
+}
+
+.innerCastBar {
+  position: relative;
+  height: 50px;
+  background-color: yellow;
+  transition: width 500ms;
+}

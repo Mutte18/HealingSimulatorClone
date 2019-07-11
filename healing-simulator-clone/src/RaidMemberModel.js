@@ -42,6 +42,10 @@ export default class RaidMemberModel {
     return this.isAlive;
   }
 
+  setIsAlive(value) {
+    this.isAlive = value;
+  }
+
   getIsTargeted() {
     return this.isTargeted;
   }
