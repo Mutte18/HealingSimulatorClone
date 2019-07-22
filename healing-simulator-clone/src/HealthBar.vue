@@ -74,19 +74,21 @@
   .outerHealthBar{
     width: 100%;
     height: 50px;
-    margin: auto 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
   }
 
   .healthBarText{
-    position: relative;
-    text-align: center;
-    bottom: 35px;
+    z-index: 1;
   }
 
   .innerHealthBar{
-    width: inherit;
-    position: relative;
-    height: 50px;
+    position: absolute;
+    top:0;
+    left:0;
+    height: 100%;
     transition: width 500ms;
   }
 </style>

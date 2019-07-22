@@ -117,17 +117,15 @@
             healAmount: 10,
             cooldown: 1
           },
-          {
+          /*{
             name: 'Holy Shock',
             manaCost: 50,
             icon: 'dispel.png',
             cooldown: 5
-          }
+          }*/
         ]
       }
     },
-
-
 
     methods: {
       setTarget(index) {
@@ -233,9 +231,18 @@
           this.castHeal(this.spellList[4]);
         }else if (event.key == '6') {
           this.castHeal(this.spellList[5]);
+        }else if (event.key == 'Escape') {
+
         }
+
         else if(event.key == 'x'){
           this.resetGame();
+        }
+      },
+      cancelCast(){
+        if(this.isCasting){
+          EventBus.$emit('cancelCast');
+          this.isCasting = false;
         }
       },
       regenMana(manaAmount) {
@@ -245,6 +252,7 @@
         }
       },
       finishSpellCast(){
+        console.log("Fick event");
         this.isCasting = false;
       },
       resetGame(){
