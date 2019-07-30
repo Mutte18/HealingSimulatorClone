@@ -20,7 +20,7 @@
           </app-raid-member>
         </div>
       </div>
-      <!--<div v-if="mouseOverTarget">
+      <div v-if="mouseOverTarget">
         <app-raid-member
           :id="mouseOverTarget.getId()"
           :is-targeted="false"
@@ -28,8 +28,9 @@
           :max-health="mouseOverTarget.getMaxHealth()"
           :is-alive="mouseOverTarget.getIsAlive()">
         </app-raid-member>
+        {{ mouseOverTarget }}
       </div>
-      -->
+
     </div>
     <div style="min-height: 60px;">
     <div v-show="isCasting">
@@ -52,6 +53,7 @@
       </app-spell>
       </div>
     </div>
+    <p> {{ showRaiderAliveStatus()}}</p>
   </div>
 </template>
 
@@ -64,6 +66,7 @@
   import Spell from "./components/player/Spell"
   import CastBar from "./components/player/CastBar"
   import {SpellLogic} from './SpellLogic.js';
+  import {spellNames} from './SpellsNameEnum';
 
   export default {
     data() {
@@ -79,9 +82,10 @@
         manaRegenAmount: 1,
         manaRegenRate: 500, //milliseconds
         spellCurrentlyCasting: null,
+        raidFuckery: null,
         spellList: [
           {
-            name: 'Heal',
+            name: spellNames.HEAL,
             manaCost: 50,
             icon: 'heal.png',
             cooldown: 1,
@@ -89,7 +93,7 @@
             healAmount: 25
           },
           {
-            name: 'Flash Heal',
+            name: spellNames.FLASH_HEAL,
             manaCost: 90,
             icon: 'flash_heal.png',
             cooldown: 1,
@@ -97,7 +101,7 @@
             healAmount: 45
           },
           {
-            name: 'Circle of Healing',
+            name: spellNames.CIRCLE_OF_HEALING,
             manaCost: 50,
             icon: 'circle_of_healing.png',
             castTime: 0,
@@ -105,14 +109,14 @@
             cooldown: 1
           },
           {
-            name: 'Renew',
+            name: spellNames.RENEW,
             manaCost: 50,
             icon: 'renew.png',
             healAmount: -50,
             cooldown: 1
           },
           {
-            name: 'Dispel',
+            name: spellNames.DISPEL,
             manaCost: 50,
             icon: 'dispel.png',
             healAmount: 10,
@@ -154,7 +158,7 @@
         for (let i = 0; i < this.raidSize; i++) {
           this.raidMembers.push(new RaidMemberModel({
             id: i,
-            healthPoints: 100,
+            healthPoints: i+1,
             maxHealth: 100,
             isAlive: true,
             isTargeted: false
@@ -169,10 +173,14 @@
           target = this.clickedTarget;
         }
         if (target && target.getIsAlive() && !this.isCasting && this.checkIfEnoughManaForCast(spellObject)) {
+          let targetsToHeal = target;
+          if(spellObject.name === spellNames.CIRCLE_OF_HEALING){
+            targetsToHeal = this.getAoEHealTargets(target);
+          }
           this.useMana(spellObject.manaCost);
           this.isCasting = true;
           this.spellCurrentlyCasting = spellObject;
-          SpellLogic.castSpell(spellObject, target);
+          SpellLogic.castSpell(spellObject, targetsToHeal);
           //this.castSpell(this.spellList[1], target);
         } else {
           console.log("No target")
@@ -190,11 +198,59 @@
         });
         this.useMana(150);
       },
+      getLowestHPRaider(unsortedRaiders){
+        let lowest = unsortedRaiders[0];
+        for (let i = 1; i < unsortedRaiders.length; i++) {
+          if (unsortedRaiders[i].healthPoints < lowest.healthPoints){
+            lowest = unsortedRaiders[i];
+          }
+        }
+        return lowest;
+      },
+      getAoEHealTargets(target){
+        //This should return 4 of the raiders with the lowest amount of hp, that are still alive
+        let raiders = Array.from(this.raidMembers);
+        raiders.splice(raiders.indexOf(target), 1);
+
+
+        for(let i = 0; i < raiders.length; i++){
+          if(raiders[i] !== undefined) {
+            if (!raiders[i].getIsAlive()) {
+              const index = raiders.indexOf(raiders[i]);
+              if (index !== -1) {
+                console.log(raiders.splice(index, 1));
+                i--;
+              }
+            }
+          }
+        }
+        console.log(raiders.length);
+
+
+        let healingTargets = [];
+        for(let i = 0; i < 4; i++){
+          let lowestHpRaider = this.getLowestHPRaider(raiders);
+          if(lowestHpRaider !== undefined) {
+            healingTargets.push(lowestHpRaider);
+            raiders.splice(raiders.indexOf(lowestHpRaider), 1);
+          }
+        }
+        healingTargets.push(target);
+        console.log(healingTargets);
+        return healingTargets;
+      },
       useMana(manaCost) {
         this.manaPoints -= manaCost;
         if (this.manaPoints <= 0) {
           this.manaPoints = 0;
         }
+      },
+      showRaiderAliveStatus(){
+        const arrayToPrint = [];
+        this.raidMembers.forEach((raider) => {
+          arrayToPrint.push({id: raider.getId(), alive: raider.getIsAlive()})
+        });
+        return arrayToPrint;
       },
       doDamage(raidMember, damage) {
         raidMember.reduceHealthPoints(damage);
@@ -235,6 +291,8 @@
           this.castHeal(this.spellList[5]);
         }else if (event.key == 'Escape') {
           this.cancelCast();
+        }else if (event.key == 'z'){
+
         }
 
         else if(event.key == 'x'){
@@ -280,7 +338,7 @@
     created() {
       this.createRaiders();
       this.setUpKeyListener();
-      this.inflictPeriodicDamage(1000);
+      //this.inflictPeriodicDamage(1000);
       this.restorePeriodicMana(this.manaRegenRate);
       EventBus.$on('spellCastFinish', () => {
         this.finishSpellCast();

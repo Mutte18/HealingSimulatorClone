@@ -3,17 +3,17 @@ import {EventBus} from "./main";
 let castTimeout;
 
 export const SpellLogic = {
-  castSpell: function (spellObject, targetObject) {
+  castSpell: function (spellObject, targetObjects) {
     let castTime = spellObject.castTime;
     console.log(castTime);
     if (castTime > 0) {
       EventBus.$emit('startSpellCast', spellObject);
       castTimeout = setTimeout(() => {
-        performSpellAction(spellObject, targetObject);
+        performSpellAction(spellObject, targetObjects);
         EventBus.$emit('spellCastFinish');
       }, castTime);
     } else {
-      performSpellAction(spellObject, targetObject);
+      performSpellAction(spellObject, targetObjects);
       EventBus.$emit('spellCastFinish');
     }
   },
@@ -23,12 +23,14 @@ export const SpellLogic = {
   }
 };
 
-function performSpellAction(spellObject, targetObject) {
+function performSpellAction(spellObject, targetObjects) {
   let healValue = spellObject.healAmount;
-  if (!spellObject || !targetObject) {
+  if (!spellObject || !targetObjects) {
     return;
   }
-  if (targetObject.getIsAlive()) {
-    targetObject.increaseHealthPoints(healValue);
-  }
+  targetObjects.forEach((target) => {
+    if(target.getIsAlive()){
+      target.increaseHealthPoints(healValue);
+    }
+  });
 }
