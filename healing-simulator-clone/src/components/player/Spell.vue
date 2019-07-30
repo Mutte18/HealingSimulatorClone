@@ -1,6 +1,6 @@
 <template>
     <div class="spell">
-      <img :src="require(`./assets/${spellIcon}`)" alt="" width="50px" height="50px" style="align-content: center">
+      <img :src="require(`../../assets/${spellIcon}`)" alt="" width="50px" height="50px" style="align-content: center">
       <br>{{ spellName }}
       <br>{{ spellBarIndex }}
     </div>

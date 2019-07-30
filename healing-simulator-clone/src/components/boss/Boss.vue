@@ -1,7 +1,7 @@
 <template>
   <div>
     <div >
-      <img src="./assets/murloc_boss.jpg" width="125px" height="150px" alt=""
+      <img src="../../assets/murloc_boss.jpg" width="125px" height="150px" alt=""
            style="border: solid 1px black; margin-left: 47%">
     </div>
   <app-boss-health-bar

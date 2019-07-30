@@ -16,7 +16,7 @@
 </template>
 
 <script>
-  import {EventBus} from "./main";
+  import {EventBus} from "../../main";
   import HealthBar from "./HealthBar";
 
   export default {

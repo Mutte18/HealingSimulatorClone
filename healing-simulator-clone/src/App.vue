@@ -56,13 +56,13 @@
 </template>
 
 <script>
-  import RaidMember from './RaidMember.vue';
+  import RaidMember from './components/raider/RaidMember.vue';
   import {EventBus} from "./main";
   import RaidMemberModel from './RaidMemberModel';
-  import ManaBar from "./ManaBar.vue";
-  import Boss from "./Boss";
-  import Spell from "./Spell"
-  import CastBar from "./CastBar"
+  import ManaBar from "./components/player/ManaBar.vue";
+  import Boss from "./components/boss/Boss";
+  import Spell from "./components/player/Spell"
+  import CastBar from "./components/player/CastBar"
   import {SpellLogic} from './SpellLogic.js';
 
   export default {
@@ -78,6 +78,7 @@
         maxMana: 1000,
         manaRegenAmount: 1,
         manaRegenRate: 500, //milliseconds
+        spellCurrentlyCasting: null,
         spellList: [
           {
             name: 'Heal',
@@ -92,7 +93,7 @@
             manaCost: 90,
             icon: 'flash_heal.png',
             cooldown: 1,
-            castTime: 20000,
+            castTime: 1500,
             healAmount: 45
           },
           {
@@ -170,6 +171,7 @@
         if (target && target.getIsAlive() && !this.isCasting && this.checkIfEnoughManaForCast(spellObject)) {
           this.useMana(spellObject.manaCost);
           this.isCasting = true;
+          this.spellCurrentlyCasting = spellObject;
           SpellLogic.castSpell(spellObject, target);
           //this.castSpell(this.spellList[1], target);
         } else {
@@ -206,7 +208,7 @@
       },
       restorePeriodicMana(manaRegenRate) {
         setInterval(() => {
-          this.regenMana(this.manaRegenAmount)
+          this.regenMana(this.manaRegenAmount);
           this.bossHp -= 1;
         }, manaRegenRate)
       },
@@ -232,7 +234,7 @@
         }else if (event.key == '6') {
           this.castHeal(this.spellList[5]);
         }else if (event.key == 'Escape') {
-
+          this.cancelCast();
         }
 
         else if(event.key == 'x'){
@@ -242,7 +244,16 @@
       cancelCast(){
         if(this.isCasting){
           EventBus.$emit('cancelCast');
+          this.refundMana(this.spellCurrentlyCasting.manaCost);
+          SpellLogic.cancelCast();
           this.isCasting = false;
+          this.spellCurrentlyCasting = null;
+        }
+      },
+      refundMana(manaCost) {
+        this.manaPoints += manaCost;
+        if(this.manaPoints > this.maxMana){
+          this.manaPoints = this.maxMana;
         }
       },
       regenMana(manaAmount) {
@@ -252,8 +263,8 @@
         }
       },
       finishSpellCast(){
-        console.log("Fick event");
         this.isCasting = false;
+        this.spellCurrentlyCasting = null;
       },
       resetGame(){
         this.raidMembers.forEach((raidMember) => {

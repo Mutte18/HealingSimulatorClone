@@ -1,21 +1,21 @@
 <template>
   <div class="outerCastBar">
     <div class="innerCastBar" :style="getCastBarInnerWidth()"></div>
-    <div class="castBarText" v-if="spellName !== null"> {{ spellName }} </div>
+    <div class="castBarText" v-if="spellName !== null"> {{ spellName }}</div>
   </div>
 </template>
 
 <script>
-  import {EventBus} from "./main";
+  import {EventBus} from "../../main";
 
   export default {
-    props: {
-    },
+    props: {},
     data() {
       return {
         width: 0,
         isCasting: false,
         spellName: null,
+        updateProgress: null,
       }
     },
     methods: {
@@ -25,28 +25,32 @@
       finishSpellCast() {
         this.width = 0;
         this.isCasting = false;
+        clearInterval(this.updateProgress);
+
       },
       getCastBarInnerWidth() {
         return {
           width: this.width + '%'
         }
       },
+      cancelCast() {
+
+      },
       updateCastBarProgress(castTime) {
         let updateRate = (castTime / 50) - 2;
         let updateAmountPerTick = 100 / updateRate;
-
         let startTime = Date.now();
-        const updateProgress = setInterval(() => {
+        this.updateProgress = setInterval(() => {
 
           if (this.width >= 100) {
             let endTime = Date.now() - startTime;
-            clearInterval(updateProgress);
-            console.log('UPDATERATE:' + updateRate,'ENDTIME:' + endTime);
+            console.log('UPDATERATE:' + updateRate, 'ENDTIME:' + endTime);
             this.finishSpellCast();
           } else {
             this.width += updateAmountPerTick;
           }
         }, 50)
+
       },
     },
     computed: {},
@@ -57,6 +61,9 @@
           this.spellName = spellObject.name;
           this.startSpellCast(spellObject.castTime);
         }
+      });
+      EventBus.$on('cancelCast', () => {
+        this.finishSpellCast();
       });
     }
 

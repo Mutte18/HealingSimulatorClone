@@ -1,12 +1,14 @@
 import {EventBus} from "./main";
 
+let castTimeout;
+
 export const SpellLogic = {
   castSpell: function (spellObject, targetObject) {
     let castTime = spellObject.castTime;
     console.log(castTime);
     if (castTime > 0) {
       EventBus.$emit('startSpellCast', spellObject);
-      setTimeout(() => {
+      castTimeout = setTimeout(() => {
         performSpellAction(spellObject, targetObject);
         EventBus.$emit('spellCastFinish');
       }, castTime);
@@ -15,6 +17,10 @@ export const SpellLogic = {
       EventBus.$emit('spellCastFinish');
     }
   },
+  cancelCast: function () {
+    clearTimeout(castTimeout);
+    console.log('clearade timeout');
+  }
 };
 
 function performSpellAction(spellObject, targetObject) {
