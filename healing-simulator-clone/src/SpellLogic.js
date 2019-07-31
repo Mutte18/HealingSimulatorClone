@@ -28,9 +28,17 @@ function performSpellAction(spellObject, targetObjects) {
   if (!spellObject || !targetObjects) {
     return;
   }
-  targetObjects.forEach((target) => {
-    if(target.getIsAlive()){
+  if(targetObjects instanceof Array) {
+    targetObjects.forEach((target) => {
+      if (target.getIsAlive()) {
+        target.increaseHealthPoints(healValue);
+      }
+    });
+  }
+  else {
+    const target = targetObjects;
+    if (target.getIsAlive()) {
       target.increaseHealthPoints(healValue);
     }
-  });
+  }
 }

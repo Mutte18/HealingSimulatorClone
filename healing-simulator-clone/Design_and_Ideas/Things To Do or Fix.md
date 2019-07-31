@@ -11,14 +11,14 @@ Spell casting:
   - Add an error message when you dont have enough mana for casting a spell.
   
   Spells:
-  - AoE heal:
-      This spell should heal X amount of raid members for a reasonable amount. It should be quite costly in mana
-      so that you are not able to spam it. (It should heal the raider targeted + 4 of the raiders with the lowest hp)
     Cooldown:
       Some spells should have a cooldown, limiting you how often you are able to cast it. Ideally it should show a
       rotating timer around the spell icon to show when it is ready again. Spells have a cooldown, but need a css
       animation on the icon. The cooldown is also not currently used.
 
+  Castbar:
+    Should show the time remaining on the cast as seconds.
+    
 Boss health:
 Progression:
 

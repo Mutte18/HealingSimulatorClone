@@ -20,7 +20,7 @@
           </app-raid-member>
         </div>
       </div>
-      <div v-if="mouseOverTarget">
+      <!--<div v-if="mouseOverTarget">
         <app-raid-member
           :id="mouseOverTarget.getId()"
           :is-targeted="false"
@@ -29,7 +29,7 @@
           :is-alive="mouseOverTarget.getIsAlive()">
         </app-raid-member>
         {{ mouseOverTarget }}
-      </div>
+      </div> -->
 
     </div>
     <div style="min-height: 60px;">
@@ -49,11 +49,11 @@
         :cooldown-time="spell.cooldown"
         :spell-icon="spell.icon"
         :spell-name="spell.name"
-        :spell-bar-index="index + 1">
+        :spell-bar-index="index + 1"
+        :internal-cooldown-active="internalCooldownActive">
       </app-spell>
       </div>
     </div>
-    <p> {{ showRaiderAliveStatus()}}</p>
   </div>
 </template>
 
@@ -83,6 +83,7 @@
         manaRegenRate: 500, //milliseconds
         spellCurrentlyCasting: null,
         raidFuckery: null,
+        internalCooldownActive: false,
         spellList: [
           {
             name: spellNames.HEAL,
@@ -102,9 +103,9 @@
           },
           {
             name: spellNames.CIRCLE_OF_HEALING,
-            manaCost: 50,
+            manaCost: 150,
             icon: 'circle_of_healing.png',
-            castTime: 0,
+            castTime: 1000,
             healAmount: 150,
             cooldown: 1
           },
@@ -158,7 +159,7 @@
         for (let i = 0; i < this.raidSize; i++) {
           this.raidMembers.push(new RaidMemberModel({
             id: i,
-            healthPoints: i+1,
+            healthPoints: 85,
             maxHealth: 100,
             isAlive: true,
             isTargeted: false
@@ -172,13 +173,20 @@
         } else if (this.clickedTarget) {
           target = this.clickedTarget;
         }
-        if (target && target.getIsAlive() && !this.isCasting && this.checkIfEnoughManaForCast(spellObject)) {
+        if (
+          target &&
+          target.getIsAlive() &&
+          !this.isCasting &&
+          this.checkIfEnoughManaForCast(spellObject) &&
+          !this.internalCooldownActive
+        ) {
           let targetsToHeal = target;
           if(spellObject.name === spellNames.CIRCLE_OF_HEALING){
             targetsToHeal = this.getAoEHealTargets(target);
           }
           this.useMana(spellObject.manaCost);
           this.isCasting = true;
+          this.startInternalCooldown();
           this.spellCurrentlyCasting = spellObject;
           SpellLogic.castSpell(spellObject, targetsToHeal);
           //this.castSpell(this.spellList[1], target);
@@ -186,6 +194,12 @@
           console.log("No target")
         }
 
+      },
+      startInternalCooldown(){
+        this.internalCooldownActive = true;
+        setTimeout(() => {
+          this.internalCooldownActive = false;
+        }, 1000)
       },
       checkIfEnoughManaForCast(spellObject){
         return this.manaPoints - spellObject.manaCost > 0;
@@ -211,7 +225,7 @@
         //This should return 4 of the raiders with the lowest amount of hp, that are still alive
         let raiders = Array.from(this.raidMembers);
         raiders.splice(raiders.indexOf(target), 1);
-
+        this.shuffleArray(raiders);
 
         for(let i = 0; i < raiders.length; i++){
           if(raiders[i] !== undefined) {
@@ -238,6 +252,26 @@
         healingTargets.push(target);
         console.log(healingTargets);
         return healingTargets;
+      },
+
+      shuffleArray(array){
+        let currentIndex = array.length;
+        let temporaryValue ;
+        let randomIndex;
+
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+          // Pick a remaining element...
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex -= 1;
+
+          // And swap it with the current element.
+          temporaryValue = array[currentIndex];
+          array[currentIndex] = array[randomIndex];
+          array[randomIndex] = temporaryValue;
+        }
+
+        return array;
       },
       useMana(manaCost) {
         this.manaPoints -= manaCost;
@@ -305,6 +339,7 @@
           this.refundMana(this.spellCurrentlyCasting.manaCost);
           SpellLogic.cancelCast();
           this.isCasting = false;
+          this.internalCooldownActive = false;
           this.spellCurrentlyCasting = null;
         }
       },
@@ -338,7 +373,7 @@
     created() {
       this.createRaiders();
       this.setUpKeyListener();
-      //this.inflictPeriodicDamage(1000);
+      this.inflictPeriodicDamage(1200);
       this.restorePeriodicMana(this.manaRegenRate);
       EventBus.$on('spellCastFinish', () => {
         this.finishSpellCast();
@@ -379,4 +414,6 @@
     background-color: orange;
     height: 100px;
   }
+
+
 </style>

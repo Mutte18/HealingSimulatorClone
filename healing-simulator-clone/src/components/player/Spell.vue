@@ -1,43 +1,105 @@
 <template>
-    <div class="spell">
-      <img :src="require(`../../assets/${spellIcon}`)" alt="" width="50px" height="50px" style="align-content: center">
+
+  <div class="spell">
+    <div class="timer" v-if="internalCooldownActive">
+    </div>
+      <img :src="require(`../../assets/${spellIcon}`)"
+           alt=""
+           width="50px"
+           height="50px"
+           style="align-content: center"
+      >
+
       <br>{{ spellName }}
       <br>{{ spellBarIndex }}
-    </div>
+  </div>
 </template>
 
 <script>
-    export default {
-      props: {
-        spellIcon: {
-          type: String,
-          required: true
-        },
-        cooldownTime: {
-          type: Number,
-          required: true
-        },
-        spellBarIndex: {
-          type: Number,
-          required: true
-        },
-        spellName: {
-          type: String,
-          required: true
-        }
+  export default {
+    props: {
+      spellIcon: {
+        type: String,
+        required: true
       },
-        data() {
-          return {
-
-          }
-        }
-    }
+      cooldownTime: {
+        type: Number,
+        required: true
+      },
+      spellBarIndex: {
+        type: Number,
+        required: true
+      },
+      spellName: {
+        type: String,
+        required: true
+      },
+      internalCooldownActive: {
+        type: Boolean,
+        required: true
+      },
+    },
+    data() {
+      return {
+      }
+    },
+  }
 </script>
 
 <style scoped>
-  .spell{
+  .spell {
     float: left;
     margin-left: 30px;
-    border: solid 1px black
+    border: solid 1px black;
+    z-index: 0;
+  }
+
+  .timer {
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    background: linear-gradient(90deg, black 50%, gray 50%);
+    position: absolute;
+    z-index: 1;
+    animation: timer 1s steps(1000, start) 1;
+    opacity: 0.7;
+  }
+
+  .timer:after {
+    border-radius: 100% 0 0 100% / 50% 0 0 50%;
+    content: '';
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 50%;
+    transform-origin: 100% 50%;
+    animation: mask 1s steps(1000, start) 1;
+  }
+
+  @keyframes timer {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes mask {
+    0% {
+      background: gray;
+      transform: rotate(0deg);
+    }
+    50% {
+      background: gray;
+      transform: rotate(-180deg);
+    }
+    50.01% {
+      background: black;
+      transform: rotate(0deg);
+    }
+    100% {
+      background: black;
+      transform: rotate(-180deg);
+    }
+
   }
 </style>
