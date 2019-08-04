@@ -89,17 +89,19 @@
             name: spellNames.HEAL,
             manaCost: 50,
             icon: 'heal.png',
-            cooldown: 1,
+            cooldown: 5,
             castTime: 2000,
-            healAmount: 25
+            healAmount: 25,
+            targetAmount: 1
           },
           {
             name: spellNames.FLASH_HEAL,
             manaCost: 90,
             icon: 'flash_heal.png',
-            cooldown: 1,
+            cooldown: 3,
             castTime: 1500,
-            healAmount: 45
+            healAmount: 45,
+            targetAmount: 1
           },
           {
             name: spellNames.CIRCLE_OF_HEALING,
@@ -107,21 +109,24 @@
             icon: 'circle_of_healing.png',
             castTime: 1000,
             healAmount: 150,
-            cooldown: 1
+            cooldown: 4,
+            targetAmount: 4
           },
           {
             name: spellNames.RENEW,
             manaCost: 50,
             icon: 'renew.png',
             healAmount: -50,
-            cooldown: 1
+            cooldown: 1,
+            targetAmount: 1
           },
           {
             name: spellNames.DISPEL,
             manaCost: 50,
             icon: 'dispel.png',
             healAmount: 10,
-            cooldown: 1
+            cooldown: 1,
+            targetAmount: 1
           },
           /*{
             name: 'Holy Shock',
@@ -182,7 +187,7 @@
         ) {
           let targetsToHeal = target;
           if(spellObject.name === spellNames.CIRCLE_OF_HEALING){
-            targetsToHeal = this.getAoEHealTargets(target);
+            targetsToHeal = this.getAoEHealTargets(target, spellObject);
           }
           this.useMana(spellObject.manaCost);
           this.isCasting = true;
@@ -221,15 +226,17 @@
         }
         return lowest;
       },
-      getAoEHealTargets(target){
+      getAoEHealTargets(target, spellObject){
         //This should return 4 of the raiders with the lowest amount of hp, that are still alive
         let raiders = Array.from(this.raidMembers);
         raiders.splice(raiders.indexOf(target), 1);
         this.shuffleArray(raiders);
 
+        //Remove the raiders that are dead or are on 0 hp. So that they are not chosen as heal targets
         for(let i = 0; i < raiders.length; i++){
-          if(raiders[i] !== undefined) {
-            if (!raiders[i].getIsAlive()) {
+          let raider = raiders[i];
+          if(raider !== undefined) {
+            if (!raider.getIsAlive() || raider.getHealthPoints() <= 0) {
               const index = raiders.indexOf(raiders[i]);
               if (index !== -1) {
                 console.log(raiders.splice(index, 1));
@@ -238,11 +245,9 @@
             }
           }
         }
-        console.log(raiders.length);
-
 
         let healingTargets = [];
-        for(let i = 0; i < 4; i++){
+        for(let i = 0; i < spellObject.targetAmount; i++){
           let lowestHpRaider = this.getLowestHPRaider(raiders);
           if(lowestHpRaider !== undefined) {
             healingTargets.push(lowestHpRaider);
@@ -277,6 +282,14 @@
         this.manaPoints -= manaCost;
         if (this.manaPoints <= 0) {
           this.manaPoints = 0;
+        }
+      },
+      killRandomPlayers(amountToKill, raidersArray){
+        for(let i = 0; i < amountToKill; i++)
+        {
+          let raider = raidersArray[i];
+          raider.setHealthPoints(0);
+          raider.setIsAlive(false);
         }
       },
       showRaiderAliveStatus(){
@@ -326,7 +339,7 @@
         }else if (event.key == 'Escape') {
           this.cancelCast();
         }else if (event.key == 'z'){
-
+          this.killRandomPlayers(14, this.raidMembers);
         }
 
         else if(event.key == 'x'){

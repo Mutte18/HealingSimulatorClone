@@ -1,7 +1,7 @@
 <template>
 
   <div class="spell">
-    <div class="timer" v-if="internalCooldownActive">
+    <div class="timer" v-if="internalCooldownActive && !onCooldown">
     </div>
       <img :src="require(`../../assets/${spellIcon}`)"
            alt=""
@@ -9,6 +9,7 @@
            height="50px"
            style="align-content: center"
       >
+      <p v-if="onCooldown" style="font-size: 24px;"> {{ this.remainingCooldown }}</p>
 
       <br>{{ spellName }}
       <br>{{ spellBarIndex }}
@@ -41,8 +42,26 @@
     },
     data() {
       return {
+        remainingCooldown: this.cooldownTime,
+        onCooldown: false
       }
     },
+    methods: {
+      startCooldown(){
+        this.onCooldown = true;
+        setInterval(() => {
+          this.remainingCooldown -= 1;
+          if(this.remainingCooldown <= 0){
+            clearInterval();
+            this.remainingCooldown = this.cooldownTime;
+            this.onCooldown = false;
+          }
+        }, 1000)
+      }
+    },
+    created(){
+      this.startCooldown();
+    }
   }
 </script>
 

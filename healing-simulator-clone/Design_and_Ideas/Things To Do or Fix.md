@@ -15,9 +15,31 @@ Spell casting:
       Some spells should have a cooldown, limiting you how often you are able to cast it. Ideally it should show a
       rotating timer around the spell icon to show when it is ready again. Spells have a cooldown, but need a css
       animation on the icon. The cooldown is also not currently used.
+    SpellTargets:
+      In the spell objects, add amount of targets the heal should heal and it can be used in the for loops and I dont
+      have to check for array when looping.
 
   Castbar:
     Should show the time remaining on the cast as seconds.
+    
+CSS:
+  Investigate how I can use flexbox instead of using margin everywhere.
+  
+CodeStructure:
+  App.vue is way too big and handles way too many things. This should be split up in further files/components
+  The spell casting code is a bit convoluted. This should be able to be refined and more generic.
+
+
+Idea for how spell casting should work:
+  An array of all spells, each spell as an object. 
+  The spell has: 
+  - name
+  - mana cost 
+  - heal amount 
+  - amount of targets (1-many)
+  
+  When casting the spell I should receive the target or targets as an array and just loop through
+  length and heal those that are in the array. So that I do not need to have edge cases for every spell.
     
 Boss health:
 Progression:
