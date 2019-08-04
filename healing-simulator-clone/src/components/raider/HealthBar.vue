@@ -1,7 +1,9 @@
 <template>
   <div class="outerHealthBar" :style="getIsAliveBackgroundColorStatus">
     <div class="innerHealthBar" :style="getHealthPointStyle"></div>
-    <div class="healthBarText"> {{displayHealthStatus}} </div>
+    <div class="healthBarText">
+      <p>{{displayHealthStatus}}  </p>
+  </div>
   </div>
 </template>
 
@@ -19,6 +21,10 @@
         isAlive: {
           type: Boolean,
           required: true
+        },
+        classification: {
+          type: String,
+          required: true
         }
       },
       data() {
@@ -27,23 +33,25 @@
         }
       },
       methods: {
-
+        getHealthPercentage(){
+          return (this.healthPoints / this.maxHealth) * 100;
+        }
       },
       computed: {
         getHealthPointStyle() {
           let backgroundColor = '';
-          if (this.healthPoints > 75) {
+          if (this.getHealthPercentage() > 75) {
             backgroundColor = 'green';
-          } else if (this.healthPoints > 50) {
+          } else if (this.getHealthPercentage() > 50) {
             backgroundColor = 'lightgreen';
-          } else if (this.healthPoints > 25) {
+          } else if (this.getHealthPercentage() > 25) {
             backgroundColor = 'yellow';
-          } else if (this.healthPoints > 0) {
+          } else if (this.getHealthPercentage() > 0) {
             backgroundColor = 'red';
           }
           return {
             backgroundColor: backgroundColor,
-            width: this.healthPoints + '%'
+            width: this.getHealthPercentage() + '%'
           }
         },
         getIsAliveBackgroundColorStatus(){
@@ -60,7 +68,7 @@
         },
         displayHealthStatus() {
           if(this.isAlive){
-            return `${this.healthPoints} /  ${this.maxHealth}`
+            return `HP: ${this.healthPoints} /  ${this.maxHealth} ${this.classification}`
           }
           else {
             return 'DEAD'

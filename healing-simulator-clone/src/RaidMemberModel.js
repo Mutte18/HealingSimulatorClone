@@ -5,6 +5,7 @@ export default class RaidMemberModel {
     this.maxHealth = raidMember.maxHealth;
     this.isAlive = raidMember.isAlive;
     this.isTargeted = raidMember.isTargeted;
+    this.classification = raidMember.classification;
   };
 
   getId() {
@@ -52,5 +53,9 @@ export default class RaidMemberModel {
 
   setIsTargeted(isTargeted) {
     this.isTargeted = isTargeted;
+  }
+
+  getClassification(){
+    return this.classification;
   }
 }

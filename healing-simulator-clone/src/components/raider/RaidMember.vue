@@ -8,6 +8,7 @@
         :health-points="healthPoints"
         :max-health="maxHealth"
         :is-alive="isAlive"
+        :classification="classification"
       >
       </app-health-bar>
     </div>
@@ -39,6 +40,10 @@
       },
       isAlive: {
         type: Boolean,
+        required: true
+      },
+      classification: {
+        type: String,
         required: true
       }
 

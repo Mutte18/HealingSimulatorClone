@@ -16,6 +16,7 @@
             :health-points="raidMembers[index].getHealthPoints()"
             :max-health="raidMembers[index].getMaxHealth()"
             :is-alive="raidMembers[index].getIsAlive()"
+            :classification="raidMembers[index].getClassification()"
           >
           </app-raid-member>
         </div>
@@ -67,6 +68,7 @@
   import CastBar from "./components/player/CastBar"
   import {SpellLogic} from './SpellLogic.js';
   import {spellNames} from './SpellsNameEnum';
+  import {classifications} from "./raiderClassifications";
 
   export default {
     data() {
@@ -162,12 +164,40 @@
 
       createRaiders() {
         for (let i = 0; i < this.raidSize; i++) {
+          let classification;
+          let healthPoints;
+          let maxHealth;
+          switch(i){
+            case 0:
+            case 1:
+              classification = classifications.TANK;
+              healthPoints = 500;
+              maxHealth = 500;
+              break;
+            case 2:
+              classification = classifications.YOU;
+              healthPoints = 250;
+              maxHealth = 250;
+              break;
+            case 3:
+            case 4:
+              classification = classifications.HEALER;
+              healthPoints = 200;
+              maxHealth = 200;
+              break;
+            default:
+              classification = classifications.DPS;
+              healthPoints = 150;
+              maxHealth = 150;
+              break;
+          }
           this.raidMembers.push(new RaidMemberModel({
             id: i,
-            healthPoints: 85,
-            maxHealth: 100,
+            healthPoints: healthPoints,
+            maxHealth: maxHealth,
             isAlive: true,
-            isTargeted: false
+            isTargeted: false,
+            classification: classification
           }));
         }
       },
