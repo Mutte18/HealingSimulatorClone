@@ -69,6 +69,7 @@
   import {SpellLogic} from './SpellLogic.js';
   import {spellNames} from './SpellsNameEnum';
   import {classifications} from "./raiderClassifications";
+  import {CombatLogic} from "./CombatLogic";
 
   export default {
     data() {
@@ -342,7 +343,6 @@
       restorePeriodicMana(manaRegenRate) {
         setInterval(() => {
           this.regenMana(this.manaRegenAmount);
-          this.bossHp -= 1;
         }, manaRegenRate)
       },
       getRandomDamage() {
@@ -408,6 +408,12 @@
           raidMember.setHealthPoints(raidMember.getMaxHealth());
           this.manaPoints = this.maxMana;
         })
+      },
+      npcHealRaidersEveryFiveSeconds(){
+        setInterval(() => CombatLogic.npcHealRaiders(this.raidMembers),5000)
+      },
+      dpsDealDamageToBossEverySecond(){
+        setInterval(() => this.bossHp -= CombatLogic.raidersInflictDamage(this.raidMembers, this.bossHp),100)
       }
     },
 
@@ -417,6 +423,8 @@
       this.createRaiders();
       this.setUpKeyListener();
       this.inflictPeriodicDamage(1200);
+      this.npcHealRaidersEveryFiveSeconds();
+      this.dpsDealDamageToBossEverySecond();
       this.restorePeriodicMana(this.manaRegenRate);
       EventBus.$on('spellCastFinish', () => {
         this.finishSpellCast();
