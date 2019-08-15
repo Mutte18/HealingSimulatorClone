@@ -1,8 +1,8 @@
 <template>
   <div>
     <app-boss
-      :health-points="bossHp"
-      :max-health="10000"
+      :health-points="boss.healthPoints"
+      :max-health="boss.maxHealthPoints"
     ></app-boss>
     <div class="raid-frame">
       <div class=inner-raid-frame>
@@ -69,12 +69,13 @@
   import {SpellLogic} from './SpellLogic.js';
   import {spellNames} from './SpellsNameEnum';
   import {classifications} from "./raiderClassifications";
-  import {CombatLogic} from "./CombatLogic";
+  import {CombatLogic} from "./Combat/CombatLogic";
+  import ArrayHelper from "./Helpers/ArrayHelper";
+  import {BossCombatLogic} from "./Combat/BossCombatLogic";
 
   export default {
     data() {
       return {
-        bossHp: 10000,
         raidSize: 20,
         raidMembers: [],
         mouseOverTarget: null,
@@ -137,7 +138,13 @@
             icon: 'dispel.png',
             cooldown: 5
           }*/
-        ]
+        ],
+        boss: {
+          healthPoints: 10000,
+          maxHealthPoints: 10000,
+          minDamage: 50,
+          maxDamage: 200
+        }
       }
     },
 
@@ -168,12 +175,15 @@
           let classification;
           let healthPoints;
           let maxHealth;
+          let damageValue = 0;
+          let healingValue = 0;
           switch(i){
             case 0:
             case 1:
               classification = classifications.TANK;
               healthPoints = 500;
               maxHealth = 500;
+              damageValue = 1;
               break;
             case 2:
               classification = classifications.YOU;
@@ -185,11 +195,13 @@
               classification = classifications.HEALER;
               healthPoints = 200;
               maxHealth = 200;
+              healingValue = 20;
               break;
             default:
               classification = classifications.DPS;
               healthPoints = 150;
               maxHealth = 150;
+              damageValue = 3;
               break;
           }
           this.raidMembers.push(new RaidMemberModel({
@@ -198,7 +210,9 @@
             maxHealth: maxHealth,
             isAlive: true,
             isTargeted: false,
-            classification: classification
+            classification: classification,
+            damageValue: damageValue,
+            healingValue: healingValue
           }));
         }
       },
@@ -261,7 +275,7 @@
         //This should return 4 of the raiders with the lowest amount of hp, that are still alive
         let raiders = Array.from(this.raidMembers);
         raiders.splice(raiders.indexOf(target), 1);
-        this.shuffleArray(raiders);
+        ArrayHelper.shuffleArray(raiders);
 
         //Remove the raiders that are dead or are on 0 hp. So that they are not chosen as heal targets
         for(let i = 0; i < raiders.length; i++){
@@ -290,25 +304,6 @@
         return healingTargets;
       },
 
-      shuffleArray(array){
-        let currentIndex = array.length;
-        let temporaryValue ;
-        let randomIndex;
-
-        // While there remain elements to shuffle...
-        while (0 !== currentIndex) {
-          // Pick a remaining element...
-          randomIndex = Math.floor(Math.random() * currentIndex);
-          currentIndex -= 1;
-
-          // And swap it with the current element.
-          temporaryValue = array[currentIndex];
-          array[currentIndex] = array[randomIndex];
-          array[randomIndex] = temporaryValue;
-        }
-
-        return array;
-      },
       useMana(manaCost) {
         this.manaPoints -= manaCost;
         if (this.manaPoints <= 0) {
@@ -413,7 +408,10 @@
         setInterval(() => CombatLogic.npcHealRaiders(this.raidMembers),5000)
       },
       dpsDealDamageToBossEverySecond(){
-        setInterval(() => this.bossHp -= CombatLogic.raidersInflictDamage(this.raidMembers, this.bossHp),100)
+        setInterval(() => this.boss.healthPoints -= CombatLogic.raidersInflictDamage(this.raidMembers),1000)
+      },
+      bossAutoHit(){
+        setInterval(() => BossCombatLogic.bossNormalAttack(this.raidMembers, this.boss), 500);
       }
     },
 
@@ -422,9 +420,10 @@
     created() {
       this.createRaiders();
       this.setUpKeyListener();
-      this.inflictPeriodicDamage(1200);
+      //this.inflictPeriodicDamage(1200);
       this.npcHealRaidersEveryFiveSeconds();
       this.dpsDealDamageToBossEverySecond();
+      this.bossAutoHit();
       this.restorePeriodicMana(this.manaRegenRate);
       EventBus.$on('spellCastFinish', () => {
         this.finishSpellCast();

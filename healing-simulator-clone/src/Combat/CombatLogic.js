@@ -1,4 +1,4 @@
-import {classifications} from "./raiderClassifications";
+import {classifications} from "../raiderClassifications";
 
 export const CombatLogic = {
   npcHealRaiders: function(raidMembers){
@@ -8,11 +8,11 @@ export const CombatLogic = {
       }
     })
   },
-  raidersInflictDamage: function(raidMembers, bossHealth){
+  raidersInflictDamage: function(raidMembers){
     let damage = 0;
     raidMembers.forEach(raider => {
-      if(raider.getClassification() === classifications.DPS && raider.getIsAlive()){
-        damage++;
+      if(raider.getIsAlive()){
+        damage += raider.getDamageValue();
       }
     });
     return damage;
