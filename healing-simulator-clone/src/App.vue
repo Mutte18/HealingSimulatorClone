@@ -70,7 +70,7 @@
   import {spellNames} from './SpellsNameEnum';
   import {classifications} from "./raiderClassifications";
   import {CombatLogic} from "./Combat/CombatLogic";
-  import ArrayHelper from "./Helpers/ArrayHelper";
+  import {ArrayHelper} from "./Helpers/ArrayHelper";
   import {BossCombatLogic} from "./Combat/BossCombatLogic";
 
   export default {
@@ -275,7 +275,7 @@
         //This should return 4 of the raiders with the lowest amount of hp, that are still alive
         let raiders = Array.from(this.raidMembers);
         raiders.splice(raiders.indexOf(target), 1);
-        ArrayHelper.shuffleArray(raiders);
+        raiders = ArrayHelper.shuffleArray(raiders);
 
         //Remove the raiders that are dead or are on 0 hp. So that they are not chosen as heal targets
         for(let i = 0; i < raiders.length; i++){
