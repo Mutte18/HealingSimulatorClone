@@ -10,6 +10,7 @@
     :boss-name="bossName"
   >
   </app-boss-health-bar>
+    {{ currentTarget }}
   </div>
 </template>
 
@@ -27,6 +28,10 @@
         type: Number,
         required: true
       },
+      currentTarget: {
+        type: Object,
+        required: true
+      }
     },
     data() {
       return {

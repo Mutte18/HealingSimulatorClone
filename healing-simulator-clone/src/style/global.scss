@@ -1,0 +1,47 @@
+.castbar-wrapper {
+  .outerCastBar {
+    width: 550px;
+    height: 50px;
+    margin-left: 30%;
+    border: black solid 1px;
+  }
+
+  .castBarText {
+    position: relative;
+    text-align: center;
+    bottom: 35px;
+  }
+
+  .innerCastBar {
+    position: relative;
+    height: 50px;
+    background-color: yellow;
+    transition: width 500ms;
+  }
+
+}
+
+.raid-frame-wrapper {
+  .&.raid-frame {
+    border: 1px solid black;
+    height: 250px;
+    width: 550px;
+    margin-left: 30%;
+    margin-top: 5%;
+  }
+
+  .&.inner-raid-frame {
+    margin-left: 17px;
+    margin-top: 20px;
+    width: inherit;
+    height: inherit;
+  }
+}
+
+.spellbar {
+  margin-left: 30%;
+  width: 550px;
+  border: solid 1px black;
+  background-color: orange;
+  height: 100px;
+}

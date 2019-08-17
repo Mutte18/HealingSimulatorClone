@@ -3,8 +3,9 @@
     <app-boss
       :health-points="boss.healthPoints"
       :max-health="boss.maxHealthPoints"
+      :current-target="boss.currentTarget"
     ></app-boss>
-    <div class="raid-frame">
+    <div class="raid-frame-wrapper raid-frame">
       <div class=inner-raid-frame>
         <div v-for="(raidMember, index) in raidMembers">
           <app-raid-member
@@ -69,9 +70,9 @@
   import {SpellLogic} from './SpellLogic.js';
   import {spellNames} from './SpellsNameEnum';
   import {classifications} from "./raiderClassifications";
-  import {CombatLogic} from "./Combat/CombatLogic";
+  import {CombatLogic} from "./combat/CombatLogic";
   import {ArrayHelper} from "./Helpers/ArrayHelper";
-  import {BossCombatLogic} from "./Combat/BossCombatLogic";
+  import {BossCombatLogic} from "./combat/BossCombatLogic";
 
   export default {
     data() {
@@ -143,7 +144,8 @@
           healthPoints: 10000,
           maxHealthPoints: 10000,
           minDamage: 50,
-          maxDamage: 200
+          maxDamage: 200,
+          currentTarget: null
         }
       }
     },
@@ -411,7 +413,7 @@
         setInterval(() => this.boss.healthPoints -= CombatLogic.raidersInflictDamage(this.raidMembers),1000)
       },
       bossAutoHit(){
-        setInterval(() => BossCombatLogic.bossNormalAttack(this.raidMembers, this.boss), 500);
+        setInterval(() => BossCombatLogic.bossNormalAttack(this.raidMembers, this.boss), 1000);
       }
     },
 
@@ -442,28 +444,7 @@
 </script>
 
 <style>
-  .raid-frame {
-    border: 1px solid black;
-    height: 250px;
-    width: 550px;
-    margin-left: 30%;
-    margin-top: 5%;
-  }
 
-  .inner-raid-frame {
-    margin-left: 17px;
-    margin-top: 20px;
-    width: inherit;
-    height: inherit;
-  }
-
-  .spellbar {
-    margin-left: 30%;
-    width: 550px;
-    border: solid 1px black;
-    background-color: orange;
-    height: 100px;
-  }
 
 
 </style>
