@@ -44,8 +44,6 @@
   .outerManaBar{
     width: 550px;
     height: 50px;
-    margin-left: 30%;
-    margin-top: 10px;
     background-color: lightblue;
     border: solid black 1px;
     color: white;

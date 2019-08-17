@@ -46,10 +46,10 @@
 
 <style scoped>
   .outerHealthBar{
-    width: 75%;
+    width: 1000px;
     height: 50px;
-    margin-left: 15%;
     border: solid 1px black;
+
   }
 
   .healthBarText{

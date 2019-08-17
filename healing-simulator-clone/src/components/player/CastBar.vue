@@ -1,5 +1,5 @@
 <template>
-  <div class="castbar-wrapper outerCastBar">
+  <div class="outerCastBar">
     <div class="innerCastBar" :style="getCastBarInnerWidth()"></div>
     <div class="castBarText" v-if="spellName !== null"> {{ spellName }}</div>
   </div>
@@ -74,7 +74,6 @@
   .outerCastBar {
     width: 550px;
     height: 50px;
-    margin-left: 30%;
     border: black solid 1px;
   }
 

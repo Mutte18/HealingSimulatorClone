@@ -1,16 +1,15 @@
 <template>
   <div>
-    <div >
+    <div class="container">
       <img src="../../assets/murloc_boss.jpg" width="125px" height="150px" alt=""
-           style="border: solid 1px black; margin-left: 47%">
+           style="border: solid 1px black; ">
     </div>
-  <app-boss-health-bar
-    :health-points="healthPoints"
-    :max-health="maxHealth"
-    :boss-name="bossName"
-  >
-  </app-boss-health-bar>
-    {{ currentTarget }}
+    <app-boss-health-bar
+      :health-points="healthPoints"
+      :max-health="maxHealth"
+      :boss-name="bossName"
+    >
+    </app-boss-health-bar>
   </div>
 </template>
 
@@ -46,5 +45,6 @@
 </script>
 
 <style scoped>
+
 
 </style>

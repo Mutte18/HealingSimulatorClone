@@ -1,59 +1,65 @@
 <template>
   <div>
-    <app-boss
-      :health-points="boss.healthPoints"
-      :max-health="boss.maxHealthPoints"
-      :current-target="boss.currentTarget"
-    ></app-boss>
-    <div class="raid-frame-wrapper raid-frame">
-      <div class=inner-raid-frame>
-        <div v-for="(raidMember, index) in raidMembers">
-          <app-raid-member
-            @click.native="setTarget(index)"
-            @mouseover.native="setMouseOverTarget(index)"
-            @mouseleave.native="clearMouseOverTarget"
-            :id="raidMembers[index].getId()"
-            :is-targeted="raidMembers[index].getIsTargeted()"
-            :health-points="raidMembers[index].getHealthPoints()"
-            :max-health="raidMembers[index].getMaxHealth()"
-            :is-alive="raidMembers[index].getIsAlive()"
-            :classification="raidMembers[index].getClassification()"
-          >
-          </app-raid-member>
+    <div class="container">
+      <app-boss
+        :health-points="boss.healthPoints"
+        :max-health="boss.maxHealthPoints"
+        :current-target="boss.currentTarget"
+      />
+    </div>
+    <div class="container">
+      <div class="raid-frame">
+        <div class=inner-raid-frame>
+          <div v-for="(raidMember, index) in raidMembers">
+            <app-raid-member
+              @click.native="setTarget(index)"
+              @mouseover.native="setMouseOverTarget(index)"
+              @mouseleave.native="clearMouseOverTarget"
+              :id="raidMembers[index].getId()"
+              :is-targeted="raidMembers[index].getIsTargeted()"
+              :health-points="raidMembers[index].getHealthPoints()"
+              :max-health="raidMembers[index].getMaxHealth()"
+              :is-alive="raidMembers[index].getIsAlive()"
+              :classification="raidMembers[index].getClassification()"
+            />
+          </div>
         </div>
+        <!--<div v-if="mouseOverTarget">
+          <app-raid-member
+            :id="mouseOverTarget.getId()"
+            :is-targeted="false"
+            :health-points="mouseOverTarget.getHealthPoints()"
+            :max-health="mouseOverTarget.getMaxHealth()"
+            :is-alive="mouseOverTarget.getIsAlive()">
+          </app-raid-member>
+          {{ mouseOverTarget }}
+        </div> -->
+
       </div>
-      <!--<div v-if="mouseOverTarget">
-        <app-raid-member
-          :id="mouseOverTarget.getId()"
-          :is-targeted="false"
-          :health-points="mouseOverTarget.getHealthPoints()"
-          :max-health="mouseOverTarget.getMaxHealth()"
-          :is-alive="mouseOverTarget.getIsAlive()">
-        </app-raid-member>
-        {{ mouseOverTarget }}
-      </div> -->
-
     </div>
-    <div style="min-height: 60px;">
-    <div v-show="isCasting">
-      <app-cast-bar></app-cast-bar>
+    <div style="min-height: 60px;" class="container">
+      <div v-show="isCasting">
+        <app-cast-bar
+        />
+      </div>
     </div>
 
+    <div class="container">
+      <app-mana-bar
+        :mana-points="manaPoints"
+        :max-mana="maxMana" />
     </div>
-    <app-mana-bar
-      :mana-points="manaPoints"
-      :max-mana="maxMana">
-    </app-mana-bar>
     <hr>
-    <div class="spellbar">
-      <div v-for="(spell, index) in spellList">
-      <app-spell
-        :cooldown-time="spell.cooldown"
-        :spell-icon="spell.icon"
-        :spell-name="spell.name"
-        :spell-bar-index="index + 1"
-        :internal-cooldown-active="internalCooldownActive">
-      </app-spell>
+    <div class="container">
+      <div class="spellbar">
+        <div v-for="(spell, index) in spellList">
+          <app-spell
+            :cooldown-time="spell.cooldown"
+            :spell-icon="spell.icon"
+            :spell-name="spell.name"
+            :spell-bar-index="index + 1"
+            :internal-cooldown-active="internalCooldownActive" />
+        </div>
       </div>
     </div>
   </div>
@@ -179,7 +185,7 @@
           let maxHealth;
           let damageValue = 0;
           let healingValue = 0;
-          switch(i){
+          switch (i) {
             case 0:
             case 1:
               classification = classifications.TANK;
@@ -233,7 +239,7 @@
           !this.internalCooldownActive
         ) {
           let targetsToHeal = target;
-          if(spellObject.name === spellNames.CIRCLE_OF_HEALING){
+          if (spellObject.name === spellNames.CIRCLE_OF_HEALING) {
             targetsToHeal = this.getAoEHealTargets(target, spellObject);
           }
           this.useMana(spellObject.manaCost);
@@ -247,13 +253,13 @@
         }
 
       },
-      startInternalCooldown(){
+      startInternalCooldown() {
         this.internalCooldownActive = true;
         setTimeout(() => {
           this.internalCooldownActive = false;
         }, 1000)
       },
-      checkIfEnoughManaForCast(spellObject){
+      checkIfEnoughManaForCast(spellObject) {
         return this.manaPoints - spellObject.manaCost > 0;
       },
       castAoeHeal() {
@@ -264,25 +270,25 @@
         });
         this.useMana(150);
       },
-      getLowestHPRaider(unsortedRaiders){
+      getLowestHPRaider(unsortedRaiders) {
         let lowest = unsortedRaiders[0];
         for (let i = 1; i < unsortedRaiders.length; i++) {
-          if (unsortedRaiders[i].healthPoints < lowest.healthPoints){
+          if (unsortedRaiders[i].healthPoints < lowest.healthPoints) {
             lowest = unsortedRaiders[i];
           }
         }
         return lowest;
       },
-      getAoEHealTargets(target, spellObject){
+      getAoEHealTargets(target, spellObject) {
         //This should return 4 of the raiders with the lowest amount of hp, that are still alive
         let raiders = Array.from(this.raidMembers);
         raiders.splice(raiders.indexOf(target), 1);
         raiders = ArrayHelper.shuffleArray(raiders);
 
         //Remove the raiders that are dead or are on 0 hp. So that they are not chosen as heal targets
-        for(let i = 0; i < raiders.length; i++){
+        for (let i = 0; i < raiders.length; i++) {
           let raider = raiders[i];
-          if(raider !== undefined) {
+          if (raider !== undefined) {
             if (!raider.getIsAlive() || raider.getHealthPoints() <= 0) {
               const index = raiders.indexOf(raiders[i]);
               if (index !== -1) {
@@ -294,9 +300,9 @@
         }
 
         let healingTargets = [];
-        for(let i = 0; i < spellObject.targetAmount; i++){
+        for (let i = 0; i < spellObject.targetAmount; i++) {
           let lowestHpRaider = this.getLowestHPRaider(raiders);
-          if(lowestHpRaider !== undefined) {
+          if (lowestHpRaider !== undefined) {
             healingTargets.push(lowestHpRaider);
             raiders.splice(raiders.indexOf(lowestHpRaider), 1);
           }
@@ -312,15 +318,14 @@
           this.manaPoints = 0;
         }
       },
-      killRandomPlayers(amountToKill, raidersArray){
-        for(let i = 0; i < amountToKill; i++)
-        {
+      killRandomPlayers(amountToKill, raidersArray) {
+        for (let i = 0; i < amountToKill; i++) {
           let raider = raidersArray[i];
           raider.setHealthPoints(0);
           raider.setIsAlive(false);
         }
       },
-      showRaiderAliveStatus(){
+      showRaiderAliveStatus() {
         const arrayToPrint = [];
         this.raidMembers.forEach((raider) => {
           arrayToPrint.push({id: raider.getId(), alive: raider.getIsAlive()})
@@ -355,26 +360,24 @@
           this.castHeal(this.spellList[0]);
         } else if (event.key == '2') {
           this.castHeal(this.spellList[1]);
-        }else if (event.key == '3') {
+        } else if (event.key == '3') {
           this.castHeal(this.spellList[2]);
-        }else if (event.key == '4') {
+        } else if (event.key == '4') {
           this.castHeal(this.spellList[3]);
-        }else if (event.key == '5') {
+        } else if (event.key == '5') {
           this.castHeal(this.spellList[4]);
-        }else if (event.key == '6') {
+        } else if (event.key == '6') {
           this.castHeal(this.spellList[5]);
-        }else if (event.key == 'Escape') {
+        } else if (event.key == 'Escape') {
           this.cancelCast();
-        }else if (event.key == 'z'){
+        } else if (event.key == 'z') {
           this.killRandomPlayers(14, this.raidMembers);
-        }
-
-        else if(event.key == 'x'){
+        } else if (event.key == 'x') {
           this.resetGame();
         }
       },
-      cancelCast(){
-        if(this.isCasting){
+      cancelCast() {
+        if (this.isCasting) {
           EventBus.$emit('cancelCast');
           this.refundMana(this.spellCurrentlyCasting.manaCost);
           SpellLogic.cancelCast();
@@ -385,7 +388,7 @@
       },
       refundMana(manaCost) {
         this.manaPoints += manaCost;
-        if(this.manaPoints > this.maxMana){
+        if (this.manaPoints > this.maxMana) {
           this.manaPoints = this.maxMana;
         }
       },
@@ -395,28 +398,27 @@
           this.manaPoints = this.maxMana;
         }
       },
-      finishSpellCast(){
+      finishSpellCast() {
         this.isCasting = false;
         this.spellCurrentlyCasting = null;
       },
-      resetGame(){
+      resetGame() {
         this.raidMembers.forEach((raidMember) => {
           raidMember.setIsAlive(true);
           raidMember.setHealthPoints(raidMember.getMaxHealth());
           this.manaPoints = this.maxMana;
         })
       },
-      npcHealRaidersEveryFiveSeconds(){
-        setInterval(() => CombatLogic.npcHealRaiders(this.raidMembers),5000)
+      npcHealRaidersEveryFiveSeconds() {
+        setInterval(() => CombatLogic.npcHealRaiders(this.raidMembers), 5000)
       },
-      dpsDealDamageToBossEverySecond(){
-        setInterval(() => this.boss.healthPoints -= CombatLogic.raidersInflictDamage(this.raidMembers),1000)
+      dpsDealDamageToBossEverySecond() {
+        setInterval(() => this.boss.healthPoints -= CombatLogic.raidersInflictDamage(this.raidMembers), 1000)
       },
-      bossAutoHit(){
+      bossAutoHit() {
         setInterval(() => BossCombatLogic.bossNormalAttack(this.raidMembers, this.boss), 1000);
       }
     },
-
 
 
     created() {
@@ -444,7 +446,31 @@
 </script>
 
 <style>
+  .container {
+    display: flex;
+    justify-content: center;
+  }
 
+  .raid-frame {
+    border: 1px solid black;
+    height: 250px;
+    width: 550px;
+    margin-top: 10px;
+  }
+
+  .inner-raid-frame {
+    margin-left: 17px;
+    margin-top: 20px;
+    width: inherit;
+    height: inherit;
+  }
+
+  .spellbar {
+    width: 550px;
+    border: solid 1px black;
+    background-color: orange;
+    height: 100px;
+  }
 
 
 </style>
