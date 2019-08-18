@@ -8,6 +8,8 @@
 </template>
 
 <script>
+    import {classifications} from "../../raiderClassifications";
+
     export default {
       props: {
         healthPoints: {
@@ -48,6 +50,27 @@
             backgroundColor = 'yellow';
           } else if (this.getHealthPercentage() > 0) {
             backgroundColor = 'red';
+          }
+          return {
+            backgroundColor: backgroundColor,
+            width: this.getHealthPercentage() + '%'
+          }
+        },
+        getClassHealthbars(){
+          let backgroundColor = '';
+          switch(this.classification){
+            case classifications.TANK:
+              backgroundColor = 'brown';
+              break;
+            case classifications.HEALER:
+              backgroundColor = 'goldenyellow';
+              break;
+            case classifications.DPS:
+              backgroundColor = 'green';
+              break;
+            case classifications.YOU:
+              backgroundColor = 'green';
+              break;
           }
           return {
             backgroundColor: backgroundColor,

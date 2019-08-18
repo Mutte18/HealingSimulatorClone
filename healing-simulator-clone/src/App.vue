@@ -38,7 +38,7 @@
       </div>
     </div>
     <div style="min-height: 60px;" class="container">
-      <div v-show="isCasting">
+      <div v-show="player.spell.isCasting">
         <app-cast-bar
         />
       </div>
@@ -46,8 +46,8 @@
 
     <div class="container">
       <app-mana-bar
-        :mana-points="manaPoints"
-        :max-mana="maxMana" />
+        :mana-points="player.mana.manaPoints"
+        :max-mana="player.mana.maxMana" />
     </div>
     <hr>
     <div class="container">
@@ -58,7 +58,7 @@
             :spell-icon="spell.icon"
             :spell-name="spell.name"
             :spell-bar-index="index + 1"
-            :internal-cooldown-active="internalCooldownActive" />
+            :internal-cooldown-active="player.spell.internalCooldownActive" />
         </div>
       </div>
     </div>
@@ -85,16 +85,23 @@
       return {
         raidSize: 20,
         raidMembers: [],
-        mouseOverTarget: null,
-        clickedTarget: null,
-        isCasting: false,
-        manaPoints: 1000,
-        maxMana: 1000,
-        manaRegenAmount: 1,
-        manaRegenRate: 500, //milliseconds
-        spellCurrentlyCasting: null,
-        raidFuckery: null,
-        internalCooldownActive: false,
+        player: {
+          target: {
+            mouseOverTarget: null,
+            clickedTarget: null,
+          },
+          mana: {
+            manaPoints: 1000,
+            maxMana: 1000,
+            manaRegenAmount: 1,
+            manaRegenRate: 500, //milliseconds
+          },
+          spell: {
+            isCasting: false,
+            spellCurrentlyCasting: null,
+            internalCooldownActive: false,
+          }
+        },
         spellList: [
           {
             name: spellNames.HEAL,
@@ -160,14 +167,14 @@
       setTarget(index) {
         this.clearTargets();
         this.raidMembers[index].setIsTargeted(true);
-        this.clickedTarget = this.raidMembers[index];
+        this.player.target.clickedTarget = this.raidMembers[index];
         this.reduceHealth(index);
       },
       setMouseOverTarget(index) {
-        this.mouseOverTarget = this.raidMembers[index];
+        this.player.target.mouseOverTarget = this.raidMembers[index];
       },
       clearMouseOverTarget() {
-        this.mouseOverTarget = null;
+        this.player.target.mouseOverTarget = null;
       },
       clearTargets() {
         this.raidMembers.forEach((raidMember) => {
@@ -226,26 +233,26 @@
       },
       castHeal(spellObject) {
         let target = null;
-        if (this.mouseOverTarget) {
-          target = this.mouseOverTarget;
-        } else if (this.clickedTarget) {
-          target = this.clickedTarget;
+        if (this.player.target.mouseOverTarget) {
+          target = this.player.target.mouseOverTarget;
+        } else if (this.player.target.clickedTarget) {
+          target = this.player.target.clickedTarget;
         }
         if (
           target &&
           target.getIsAlive() &&
-          !this.isCasting &&
+          !this.player.spell.isCasting &&
           this.checkIfEnoughManaForCast(spellObject) &&
-          !this.internalCooldownActive
+          !this.player.spell.internalCooldownActive
         ) {
           let targetsToHeal = target;
-          if (spellObject.name === spellNames.CIRCLE_OF_HEALING) {
+          if (spellObject.targetAmount > 1) {
             targetsToHeal = this.getAoEHealTargets(target, spellObject);
           }
           this.useMana(spellObject.manaCost);
-          this.isCasting = true;
+          this.player.spell.isCasting = true;
           this.startInternalCooldown();
-          this.spellCurrentlyCasting = spellObject;
+          this.player.spell.spellCurrentlyCasting = spellObject;
           SpellLogic.castSpell(spellObject, targetsToHeal);
           //this.castSpell(this.spellList[1], target);
         } else {
@@ -254,13 +261,13 @@
 
       },
       startInternalCooldown() {
-        this.internalCooldownActive = true;
+        this.player.spell.internalCooldownActive = true;
         setTimeout(() => {
-          this.internalCooldownActive = false;
+          this.player.spell.internalCooldownActive = false;
         }, 1000)
       },
       checkIfEnoughManaForCast(spellObject) {
-        return this.manaPoints - spellObject.manaCost > 0;
+        return this.player.mana.manaPoints - spellObject.manaCost > 0;
       },
       castAoeHeal() {
         this.raidMembers.forEach((raidMember) => {
@@ -313,9 +320,9 @@
       },
 
       useMana(manaCost) {
-        this.manaPoints -= manaCost;
-        if (this.manaPoints <= 0) {
-          this.manaPoints = 0;
+        this.player.mana.manaPoints -= manaCost;
+        if (this.player.mana.manaPoints <= 0) {
+          this.player.mana.manaPoints = 0;
         }
       },
       killRandomPlayers(amountToKill, raidersArray) {
@@ -344,7 +351,7 @@
       },
       restorePeriodicMana(manaRegenRate) {
         setInterval(() => {
-          this.regenMana(this.manaRegenAmount);
+          this.regenMana(this.player.mana.manaRegenAmount);
         }, manaRegenRate)
       },
       getRandomDamage() {
@@ -377,36 +384,36 @@
         }
       },
       cancelCast() {
-        if (this.isCasting) {
+        if (this.player.spell.isCasting) {
           EventBus.$emit('cancelCast');
           this.refundMana(this.spellCurrentlyCasting.manaCost);
           SpellLogic.cancelCast();
-          this.isCasting = false;
-          this.internalCooldownActive = false;
-          this.spellCurrentlyCasting = null;
+          this.player.spell.isCasting = false;
+          this.player.spell.internalCooldownActive = false;
+          this.player.spell.spellCurrentlyCasting = null;
         }
       },
       refundMana(manaCost) {
-        this.manaPoints += manaCost;
-        if (this.manaPoints > this.maxMana) {
-          this.manaPoints = this.maxMana;
+        this.player.mana.manaPoints += manaCost;
+        if (this.player.mana.manaPoints > this.player.mana.maxMana) {
+          this.player.mana.manaPoints = this.player.mana.maxMana;
         }
       },
       regenMana(manaAmount) {
-        this.manaPoints += manaAmount;
-        if (this.manaPoints > this.maxMana) {
-          this.manaPoints = this.maxMana;
+        this.player.mana.manaPoints += manaAmount;
+        if (this.player.mana.manaPoints > this.player.mana.maxMana) {
+          this.player.mana.manaPoints = this.player.mana.maxMana;
         }
       },
       finishSpellCast() {
-        this.isCasting = false;
-        this.spellCurrentlyCasting = null;
+        this.player.spell.isCasting = false;
+        this.player.spell.spellCurrentlyCasting = null;
       },
       resetGame() {
         this.raidMembers.forEach((raidMember) => {
           raidMember.setIsAlive(true);
           raidMember.setHealthPoints(raidMember.getMaxHealth());
-          this.manaPoints = this.maxMana;
+          this.player.mana.manaPoints = this.player.mana.maxMana;
         })
       },
       npcHealRaidersEveryFiveSeconds() {
@@ -428,7 +435,7 @@
       this.npcHealRaidersEveryFiveSeconds();
       this.dpsDealDamageToBossEverySecond();
       this.bossAutoHit();
-      this.restorePeriodicMana(this.manaRegenRate);
+      this.restorePeriodicMana(this.player.mana.manaRegenRate);
       EventBus.$on('spellCastFinish', () => {
         this.finishSpellCast();
       });
@@ -453,16 +460,18 @@
 
   .raid-frame {
     border: 1px solid black;
-    height: 250px;
+    display: flex;
+    flex-direction: column;
     width: 550px;
+    justify-content: left;
     margin-top: 10px;
   }
 
   .inner-raid-frame {
     margin-left: 17px;
     margin-top: 20px;
-    width: inherit;
-    height: inherit;
+    margin-bottom: 20px;
+
   }
 
   .spellbar {

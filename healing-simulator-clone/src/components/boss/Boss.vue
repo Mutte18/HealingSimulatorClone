@@ -29,7 +29,6 @@
       },
       currentTarget: {
         type: Object,
-        required: true
       }
     },
     data() {
