@@ -1,6 +1,6 @@
 <template>
   <div class="outerHealthBar" :style="getIsAliveBackgroundColorStatus">
-    <div class="innerHealthBar" :style="getHealthPointStyle"></div>
+    <div class="innerHealthBar" :style="getClassHealthbars"></div>
     <div class="healthBarText">
       <p>{{displayHealthStatus}}  </p>
   </div>
@@ -60,16 +60,16 @@
           let backgroundColor = '';
           switch(this.classification){
             case classifications.TANK:
-              backgroundColor = 'brown';
+              backgroundColor = 'saddlebrown';
               break;
             case classifications.HEALER:
-              backgroundColor = 'goldenyellow';
+              backgroundColor = 'darkgoldenrod';
               break;
             case classifications.DPS:
               backgroundColor = 'green';
               break;
             case classifications.YOU:
-              backgroundColor = 'green';
+              backgroundColor = 'teal';
               break;
           }
           return {
@@ -120,6 +120,7 @@
     top:0;
     left:0;
     height: 100%;
-    transition: width 500ms;
+    transition: width 200ms;
+    background-color: gold;
   }
 </style>

@@ -3,6 +3,7 @@ export const spellNames = {
   FLASH_HEAL: 'Flash heal',
   CIRCLE_OF_HEALING: 'Circle of Healing',
   RENEW: 'Renew',
-  DISPEL: 'Dispel'
+  DISPEL: 'Dispel',
+  HOLY_SHOCK: 'Holy Shock'
 
 };

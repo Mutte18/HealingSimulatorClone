@@ -46,6 +46,9 @@
         onCooldown: false
       }
     },
+    computed: {
+
+    },
     methods: {
       startCooldown(){
         this.onCooldown = true;

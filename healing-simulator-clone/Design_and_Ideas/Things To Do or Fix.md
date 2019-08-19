@@ -19,7 +19,9 @@ Spell casting:
     
 CSS:
   Investigate how I can use flexbox instead of using margin everywhere.
-  
+  Find out how I can use dynamic values for the cooldown animation on the spells
+  It needs to take the cooldown time set to how long the animation should be.
+
 CodeStructure:
   App.vue is way too big and handles way too many things. This should be split up in further files/components
   The spell casting code is a bit convoluted. This should be able to be refined and more generic.

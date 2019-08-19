@@ -146,12 +146,14 @@
             cooldown: 1,
             targetAmount: 1
           },
-          /*{
-            name: 'Holy Shock',
+          {
+            name: spellNames.HOLY_SHOCK,
+            healAmount: 125,
+            castTime: 0,
             manaCost: 50,
             icon: 'dispel.png',
             cooldown: 5
-          }*/
+          }
         ],
         boss: {
           healthPoints: 10000,
@@ -475,10 +477,10 @@
   }
 
   .spellbar {
-    width: 550px;
+    width: 600px;
     border: solid 1px black;
     background-color: orange;
-    height: 100px;
+    height: auto;
   }
 
 
