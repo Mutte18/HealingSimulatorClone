@@ -9,8 +9,8 @@
         :max-health="maxHealth"
         :is-alive="isAlive"
         :classification="classification"
-      >
-      </app-health-bar>
+      />
+
     </div>
 
   </div>

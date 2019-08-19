@@ -1,4 +1,4 @@
-import {EventBus} from "./main";
+import {EventBus} from "../../main";
 
 let castTimeout;
 

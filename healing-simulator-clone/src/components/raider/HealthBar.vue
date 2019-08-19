@@ -2,7 +2,11 @@
   <div class="outerHealthBar" :style="getIsAliveBackgroundColorStatus">
     <div class="innerHealthBar" :style="getClassHealthbars"></div>
     <div class="healthBarText">
-      <p>{{displayHealthStatus}}  </p>
+      <p v-if="isAlive">
+        HP: {{  this.healthPoints }} / {{ this.maxHealth }} <br>
+        <span class="classification">{{ this.classification }} </span>
+      </p>
+      <p v-else> DEAD </p>
   </div>
   </div>
 </template>
@@ -89,14 +93,6 @@
             }
           }
         },
-        displayHealthStatus() {
-          if(this.isAlive){
-            return `HP: ${this.healthPoints} /  ${this.maxHealth} ${this.classification}`
-          }
-          else {
-            return 'DEAD'
-          }
-        }
       },
     }
 </script>
@@ -111,8 +107,13 @@
     position: relative;
   }
 
-  .healthBarText{
-    z-index: 1;
+  .healthBarText {
+    z-index: 0;
+  }
+
+  .classification {
+    display: flex;
+    justify-content: center;
   }
 
   .innerHealthBar{

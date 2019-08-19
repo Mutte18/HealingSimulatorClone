@@ -3,36 +3,35 @@
   <div class="spell">
     <div class="timer" v-if="internalCooldownActive && !onCooldown">
     </div>
-      <img :src="require(`../../assets/${spellIcon}`)"
+      <img :src="require(`../../assets/${spellObject.icon}`)"
            alt=""
            width="50px"
            height="50px"
            style="align-content: center"
       >
-      <p v-if="onCooldown" style="font-size: 24px;"> {{ this.remainingCooldown }}</p>
+      <!--<p v-if="onCooldown" style="font-size: 24px;"> {{ this.remainingCooldown }}</p> -->
 
-      <br>{{ spellName }}
-      <br>{{ spellBarIndex }}
+    <div class="index">{{ spellBarIndex }} </div>
+    <div v-if="spellObject.isHovered">
+      <spell-description
+        :spell-object="spellObject"
+      />
+    </div>
+
   </div>
 </template>
 
 <script>
+  import SpellDescription from "./SpellDescription";
+
   export default {
     props: {
-      spellIcon: {
-        type: String,
-        required: true
-      },
-      cooldownTime: {
-        type: Number,
+      spellObject: {
+        type: Object,
         required: true
       },
       spellBarIndex: {
         type: Number,
-        required: true
-      },
-      spellName: {
-        type: String,
         required: true
       },
       internalCooldownActive: {
@@ -42,12 +41,12 @@
     },
     data() {
       return {
-        remainingCooldown: this.cooldownTime,
+        remainingCooldown: this.spellObject.cooldown,
         onCooldown: false
       }
     },
-    computed: {
-
+    components: {
+      'spell-description': SpellDescription
     },
     methods: {
       startCooldown(){
@@ -56,7 +55,7 @@
           this.remainingCooldown -= 1;
           if(this.remainingCooldown <= 0){
             clearInterval();
-            this.remainingCooldown = this.cooldownTime;
+            this.remainingCooldown = this.spellObject.cooldown;
             this.onCooldown = false;
           }
         }, 1000)
@@ -70,10 +69,12 @@
 
 <style scoped>
   .spell {
-    float: left;
-    margin-left: 30px;
-    border: solid 1px black;
     z-index: 0;
+  }
+
+  .index {
+    display: flex;
+    justify-content: center;
   }
 
   .timer {

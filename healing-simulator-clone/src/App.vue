@@ -54,11 +54,11 @@
       <div class="spellbar">
         <div v-for="(spell, index) in spellList">
           <app-spell
-            :cooldown-time="spell.cooldown"
-            :spell-icon="spell.icon"
-            :spell-name="spell.name"
+            :spell-object="spell"
             :spell-bar-index="index + 1"
-            :internal-cooldown-active="player.spell.internalCooldownActive" />
+            :internal-cooldown-active="player.spell.internalCooldownActive"
+            @mouseover.native="setHoveredSpell(spell)"
+            @mouseleave.native="clearHoveredSpell(spell)"/>
         </div>
       </div>
     </div>
@@ -71,10 +71,10 @@
   import RaidMemberModel from './RaidMemberModel';
   import ManaBar from "./components/player/ManaBar.vue";
   import Boss from "./components/boss/Boss";
-  import Spell from "./components/player/Spell"
+  import Spell from "./components/spell/Spell"
   import CastBar from "./components/player/CastBar"
-  import {SpellLogic} from './SpellLogic.js';
-  import {spellNames} from './SpellsNameEnum';
+  import {SpellLogic} from './components/spell/SpellLogic.js';
+  import {spellNames} from './components/spell/SpellsNameEnum';
   import {classifications} from "./raiderClassifications";
   import {CombatLogic} from "./combat/CombatLogic";
   import {ArrayHelper} from "./Helpers/ArrayHelper";
@@ -105,54 +105,63 @@
         spellList: [
           {
             name: spellNames.HEAL,
-            manaCost: 50,
             icon: 'heal.png',
-            cooldown: 5,
-            castTime: 2000,
             healAmount: 25,
-            targetAmount: 1
+            manaCost: 50,
+            castTime: 2000,
+            cooldown: 5,
+            targetAmount: 1,
+            isHovered: false
           },
           {
             name: spellNames.FLASH_HEAL,
-            manaCost: 90,
             icon: 'flash_heal.png',
-            cooldown: 3,
-            castTime: 1500,
             healAmount: 45,
-            targetAmount: 1
+            manaCost: 90,
+            castTime: 1500,
+            cooldown: 3,
+            targetAmount: 1,
+            isHovered: false
           },
           {
             name: spellNames.CIRCLE_OF_HEALING,
-            manaCost: 150,
             icon: 'circle_of_healing.png',
-            castTime: 1000,
             healAmount: 150,
+            manaCost: 150,
+            castTime: 1000,
             cooldown: 4,
-            targetAmount: 4
+            targetAmount: 4,
+            isHovered: false
           },
           {
             name: spellNames.RENEW,
-            manaCost: 50,
             icon: 'renew.png',
             healAmount: -50,
+            manaCost: 50,
+            castTime: 0,
             cooldown: 1,
-            targetAmount: 1
+            targetAmount: 1,
+            isHovered: false
           },
           {
             name: spellNames.DISPEL,
-            manaCost: 50,
             icon: 'dispel.png',
             healAmount: 10,
+            manaCost: 50,
+            castTime: 0,
             cooldown: 1,
-            targetAmount: 1
+            targetAmount: 1,
+            isHovered: false
           },
           {
             name: spellNames.HOLY_SHOCK,
-            healAmount: 125,
-            castTime: 0,
-            manaCost: 50,
             icon: 'dispel.png',
-            cooldown: 5
+            healAmount: 125,
+            manaCost: 50,
+            castTime: 0,
+            cooldown: 5,
+            targetAmount: 1,
+            isHovered: false
           }
         ],
         boss: {
@@ -177,6 +186,12 @@
       },
       clearMouseOverTarget() {
         this.player.target.mouseOverTarget = null;
+      },
+      setHoveredSpell(spell){
+        spell.isHovered = true;
+      },
+      clearHoveredSpell(spell){
+        spell.isHovered = false;
       },
       clearTargets() {
         this.raidMembers.forEach((raidMember) => {
@@ -419,7 +434,7 @@
         })
       },
       npcHealRaidersEveryFiveSeconds() {
-        setInterval(() => CombatLogic.npcHealRaiders(this.raidMembers), 5000)
+        setInterval(() => CombatLogic.npcHealRaiders(this.raidMembers), 1000)
       },
       dpsDealDamageToBossEverySecond() {
         setInterval(() => this.boss.healthPoints -= CombatLogic.raidersInflictDamage(this.raidMembers), 1000)
@@ -480,7 +495,9 @@
     width: 600px;
     border: solid 1px black;
     background-color: orange;
-    height: auto;
+    padding-top: 5px;
+    display: flex;
+    justify-content: space-evenly;
   }
 
 
