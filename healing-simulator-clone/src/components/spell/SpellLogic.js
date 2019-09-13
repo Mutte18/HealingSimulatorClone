@@ -1,4 +1,5 @@
 import {EventBus} from "../../main";
+import {Player} from "../player/Player";
 
 let castTimeout;
 
@@ -20,8 +21,19 @@ export const SpellLogic = {
   cancelCast: function () {
     clearTimeout(castTimeout);
     console.log('clearade timeout');
-  }
+  },
+  canCastSpell(target, spellObject, playerSpell, playerMana){
+    return target &&
+      target.getIsAlive() &&
+      !playerSpell.isCasting &&
+      checkIfEnoughManaForCast(playerMana, spellObject.manaCost) &&
+      !playerSpell.internalCooldownActive
+  },
 };
+
+function checkIfEnoughManaForCast(playerMana, spellObjectManaCost) {
+  return playerMana - spellObjectManaCost > 0;
+}
 
 function performSpellAction(spellObject, targetObjects) {
   let healValue = spellObject.healAmount;

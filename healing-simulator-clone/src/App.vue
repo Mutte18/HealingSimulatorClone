@@ -68,17 +68,16 @@
 <script>
   import RaidMember from './components/raider/RaidMember.vue';
   import {EventBus} from "./main";
-  import RaidMemberModel from './RaidMemberModel';
   import ManaBar from "./components/player/ManaBar.vue";
   import Boss from "./components/boss/Boss";
   import Spell from "./components/spell/Spell"
   import CastBar from "./components/player/CastBar"
   import {SpellLogic} from './components/spell/SpellLogic.js';
-  import {spellNames} from './components/spell/SpellsNameEnum';
-  import {classifications} from "./raiderClassifications";
   import {CombatLogic} from "./combat/CombatLogic";
   import {ArrayHelper} from "./Helpers/ArrayHelper";
   import {BossCombatLogic} from "./combat/BossCombatLogic";
+  import {RaiderHelper} from "./components/raider/RaiderHelper";
+  import {SpellList} from "./components/spell/SpellList";
 
   export default {
     data() {
@@ -102,75 +101,15 @@
             internalCooldownActive: false,
           }
         },
-        spellList: [
-          {
-            name: spellNames.HEAL,
-            icon: 'heal.png',
-            healAmount: 25,
-            manaCost: 50,
-            castTime: 2000,
-            cooldown: 5,
-            targetAmount: 1,
-            isHovered: false
-          },
-          {
-            name: spellNames.FLASH_HEAL,
-            icon: 'flash_heal.png',
-            healAmount: 45,
-            manaCost: 90,
-            castTime: 1500,
-            cooldown: 3,
-            targetAmount: 1,
-            isHovered: false
-          },
-          {
-            name: spellNames.CIRCLE_OF_HEALING,
-            icon: 'circle_of_healing.png',
-            healAmount: 150,
-            manaCost: 150,
-            castTime: 1000,
-            cooldown: 4,
-            targetAmount: 4,
-            isHovered: false
-          },
-          {
-            name: spellNames.RENEW,
-            icon: 'renew.png',
-            healAmount: -50,
-            manaCost: 50,
-            castTime: 0,
-            cooldown: 1,
-            targetAmount: 1,
-            isHovered: false
-          },
-          {
-            name: spellNames.DISPEL,
-            icon: 'dispel.png',
-            healAmount: 10,
-            manaCost: 50,
-            castTime: 0,
-            cooldown: 1,
-            targetAmount: 1,
-            isHovered: false
-          },
-          {
-            name: spellNames.HOLY_SHOCK,
-            icon: 'dispel.png',
-            healAmount: 125,
-            manaCost: 50,
-            castTime: 0,
-            cooldown: 5,
-            targetAmount: 1,
-            isHovered: false
-          }
-        ],
+        spellList: [],
         boss: {
           healthPoints: 10000,
           maxHealthPoints: 10000,
           minDamage: 50,
           maxDamage: 200,
           currentTarget: null
-        }
+        },
+        gameOver: false
       }
     },
 
@@ -202,52 +141,6 @@
         this.raidMembers[index].reduceHealthPoints(15);
       },
 
-      createRaiders() {
-        for (let i = 0; i < this.raidSize; i++) {
-          let classification;
-          let healthPoints;
-          let maxHealth;
-          let damageValue = 0;
-          let healingValue = 0;
-          switch (i) {
-            case 0:
-            case 1:
-              classification = classifications.TANK;
-              healthPoints = 500;
-              maxHealth = 500;
-              damageValue = 1;
-              break;
-            case 2:
-              classification = classifications.YOU;
-              healthPoints = 250;
-              maxHealth = 250;
-              break;
-            case 3:
-            case 4:
-              classification = classifications.HEALER;
-              healthPoints = 200;
-              maxHealth = 200;
-              healingValue = 20;
-              break;
-            default:
-              classification = classifications.DPS;
-              healthPoints = 150;
-              maxHealth = 150;
-              damageValue = 3;
-              break;
-          }
-          this.raidMembers.push(new RaidMemberModel({
-            id: i,
-            healthPoints: healthPoints,
-            maxHealth: maxHealth,
-            isAlive: true,
-            isTargeted: false,
-            classification: classification,
-            damageValue: damageValue,
-            healingValue: healingValue
-          }));
-        }
-      },
       castHeal(spellObject) {
         let target = null;
         if (this.player.target.mouseOverTarget) {
@@ -255,13 +148,7 @@
         } else if (this.player.target.clickedTarget) {
           target = this.player.target.clickedTarget;
         }
-        if (
-          target &&
-          target.getIsAlive() &&
-          !this.player.spell.isCasting &&
-          this.checkIfEnoughManaForCast(spellObject) &&
-          !this.player.spell.internalCooldownActive
-        ) {
+        if (SpellLogic.canCastSpell(target, spellObject, this.player.spell, this.player.mana.manaPoints)) {
           let targetsToHeal = target;
           if (spellObject.targetAmount > 1) {
             targetsToHeal = this.getAoEHealTargets(target, spellObject);
@@ -275,17 +162,15 @@
         } else {
           console.log("No target")
         }
-
       },
+
       startInternalCooldown() {
         this.player.spell.internalCooldownActive = true;
         setTimeout(() => {
           this.player.spell.internalCooldownActive = false;
         }, 1000)
       },
-      checkIfEnoughManaForCast(spellObject) {
-        return this.player.mana.manaPoints - spellObject.manaCost > 0;
-      },
+
       castAoeHeal() {
         this.raidMembers.forEach((raidMember) => {
           if (raidMember.getIsAlive()) {
@@ -366,6 +251,22 @@
           })
         }, interval)
       },
+      checkRaidAliveStatus(){
+        const intervalID = setInterval(() => {
+          let entireRaidIsDead = true;
+          this.raidMembers.forEach((raidMember) => {
+            if(raidMember.getIsAlive()){
+              entireRaidIsDead = false;
+            }
+          });
+          if(entireRaidIsDead){
+            this.gameOver = true;
+            /*
+            STOP THE INTERVAL THIG HERE TO SET GAMEOVER OT ANYMORE
+             */
+          }
+        })
+      },
       restorePeriodicMana(manaRegenRate) {
         setInterval(() => {
           this.regenMana(this.player.mana.manaRegenAmount);
@@ -431,7 +332,8 @@
           raidMember.setIsAlive(true);
           raidMember.setHealthPoints(raidMember.getMaxHealth());
           this.player.mana.manaPoints = this.player.mana.maxMana;
-        })
+        });
+        this.gameOver = false;
       },
       npcHealRaidersEveryFiveSeconds() {
         setInterval(() => CombatLogic.npcHealRaiders(this.raidMembers), 1000)
@@ -446,7 +348,8 @@
 
 
     created() {
-      this.createRaiders();
+      this.raidMembers = RaiderHelper.createRaiders(this.raidSize);
+      this.spellList = SpellList.initializeSpells();
       this.setUpKeyListener();
       //this.inflictPeriodicDamage(1200);
       this.npcHealRaidersEveryFiveSeconds();
