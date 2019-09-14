@@ -2,30 +2,13 @@ export const Player = {
   checkIfEnoughManaForCast(spellObject) {
     return this.getPlayerMana().manaPoints - spellObject.manaCost > 0;
   },
-  getPlayerMana(){
+  getPlayerMana() {
     return playerObject.mana;
   },
-  getPlayerTarget(){
+  getPlayerTarget() {
     return playerObject.target;
   },
-  getPlayerSpell(){
+  getPlayerSpell() {
     return playerObject.spell;
-  }
+  },
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

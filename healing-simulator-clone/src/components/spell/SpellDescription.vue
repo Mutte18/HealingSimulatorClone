@@ -11,17 +11,17 @@
 </template>
 
 <script>
-  export default {
-    props: {
-      spellObject: {
-        type: Object,
-        required: true
-      }
+export default {
+  props: {
+    spellObject: {
+      type: Object,
+      required: true,
     },
-    data() {
-      return {}
-    }
-  }
+  },
+  data() {
+    return {};
+  },
+};
 </script>
 
 <style scoped>
@@ -32,5 +32,5 @@
     border-radius: 15px;
     text-align: center;
   }
-  
+
 </style>

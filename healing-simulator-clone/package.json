@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "lint": "./node_modules/.bin/eslint /healing-simulator-clone/src/"
+    "lint": "eslint --max-warnings 0 --ext .js,.vue .",
+    "lint_fix": "eslint --fix --ext .js,.vue ."
   },
   "dependencies": {
     "node-sass": "^4.12.0",

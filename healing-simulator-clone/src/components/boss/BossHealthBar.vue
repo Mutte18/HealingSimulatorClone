@@ -10,38 +10,37 @@
 </template>
 
 <script>
-    export default {
-      props: {
-        healthPoints: {
-          type: Number,
-          required: true
-        },
-        maxHealth: {
-          type: Number,
-          required: true
-        },
-        bossName: {
-          type: String,
-          required: true
-        }
-      },
-      computed: {
-        getHealthAsPercentage(){
-          let percentage = (this.healthPoints / this.maxHealth) * 100;
-          return percentage + '%'
-        },
-        getHealthPointStyle(){
-          let percentage = (this.healthPoints / this.maxHealth) * 100;
-          if(percentage <= 0)
-          {
-            percentage = 0;
-          }
-          return {
-            width: percentage + '%'
-          }
-        }
+export default {
+  props: {
+    healthPoints: {
+      type: Number,
+      required: true,
+    },
+    maxHealth: {
+      type: Number,
+      required: true,
+    },
+    bossName: {
+      type: String,
+      required: true,
+    },
+  },
+  computed: {
+    getHealthAsPercentage() {
+      const percentage = (this.healthPoints / this.maxHealth) * 100;
+      return `${percentage}%`;
+    },
+    getHealthPointStyle() {
+      let percentage = (this.healthPoints / this.maxHealth) * 100;
+      if (percentage <= 0) {
+        percentage = 0;
       }
-    }
+      return {
+        width: `${percentage}%`,
+      };
+    },
+  },
+};
 </script>
 
 <style scoped>

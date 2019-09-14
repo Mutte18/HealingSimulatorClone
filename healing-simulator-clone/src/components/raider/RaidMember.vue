@@ -17,61 +17,61 @@
 </template>
 
 <script>
-  import {EventBus} from "../../main";
-  import HealthBar from "./HealthBar";
+import { EventBus } from '../../main';
+import HealthBar from './HealthBar';
 
-  export default {
-    props: {
-      id: {
-        type: Number,
-        required: true
-      },
-      isTargeted: {
-        type: Boolean,
-        required: true
-      },
-      healthPoints: {
-        type: Number,
-        required: true
-      },
-      maxHealth: {
-        type: Number,
-        required: true
-      },
-      isAlive: {
-        type: Boolean,
-        required: true
-      },
-      classification: {
-        type: String,
-        required: true
-      }
-
+export default {
+  props: {
+    id: {
+      type: Number,
+      required: true,
     },
-    data() {
-      return {}
+    isTargeted: {
+      type: Boolean,
+      required: true,
     },
-    components: {'app-health-bar': HealthBar},
-
-    computed: {
-
+    healthPoints: {
+      type: Number,
+      required: true,
     },
-    methods: {
-      getTargeted() {
-        //return this.isTargeted;
-      },
-      setTargeted() {
-        //this.isTargeted = !this.isTargeted;
-      }
+    maxHealth: {
+      type: Number,
+      required: true,
     },
-    created() {
-      EventBus.$on('setTarget', (event) => {
-        console.log(event);
+    isAlive: {
+      type: Boolean,
+      required: true,
+    },
+    classification: {
+      type: String,
+      required: true,
+    },
 
-        this.setTargeted();
-      })
-    }
-  }
+  },
+  data() {
+    return {};
+  },
+  components: { 'app-health-bar': HealthBar },
+
+  computed: {
+
+  },
+  methods: {
+    getTargeted() {
+      // return this.isTargeted;
+    },
+    setTargeted() {
+      // this.isTargeted = !this.isTargeted;
+    },
+  },
+  created() {
+    EventBus.$on('setTarget', (event) => {
+      console.log(event);
+
+      this.setTargeted();
+    });
+  },
+};
 </script>
 
 <style>

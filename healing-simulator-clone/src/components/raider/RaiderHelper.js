@@ -1,6 +1,6 @@
 
-import RaidMemberModel from "../../RaidMemberModel";
-import {classifications} from "../../raiderClassifications";
+import RaidMemberModel from '../../RaidMemberModel';
+import { classifications } from '../../raiderClassifications';
 
 export const RaiderHelper = {
   createRaiders(raidSize) {
@@ -41,13 +41,13 @@ export const RaiderHelper = {
       }
       raidMembers.push(new RaidMemberModel({
         id: i,
-        healthPoints: healthPoints,
-        maxHealth: maxHealth,
+        healthPoints,
+        maxHealth,
         isAlive: true,
         isTargeted: false,
-        classification: classification,
-        damageValue: damageValue,
-        healingValue: healingValue
+        classification,
+        damageValue,
+        healingValue,
       }));
     }
     return raidMembers;

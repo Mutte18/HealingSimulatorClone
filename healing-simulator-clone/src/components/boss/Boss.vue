@@ -14,33 +14,33 @@
 </template>
 
 <script>
-  import BossHealthBar from "./BossHealthBar";
+import BossHealthBar from './BossHealthBar';
 
-  export default {
+export default {
 
-    props: {
-      healthPoints: {
-        type: Number,
-        required: true
-      },
-      maxHealth: {
-        type: Number,
-        required: true
-      },
-      currentTarget: {
-        type: Object,
-      }
+  props: {
+    healthPoints: {
+      type: Number,
+      required: true,
     },
-    data() {
-      return {
-        bossName: 'Mighty Murloc'
-      }
+    maxHealth: {
+      type: Number,
+      required: true,
     },
-    components: {
-      'app-boss-health-bar': BossHealthBar
-    }
+    currentTarget: {
+      type: Object,
+    },
+  },
+  data() {
+    return {
+      bossName: 'Mighty Murloc',
+    };
+  },
+  components: {
+    'app-boss-health-bar': BossHealthBar,
+  },
 
-  }
+};
 </script>
 
 <style scoped>

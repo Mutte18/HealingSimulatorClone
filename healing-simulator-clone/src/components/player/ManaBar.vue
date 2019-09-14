@@ -6,38 +6,37 @@
 </template>
 
 <script>
-    export default {
-      props: {
-        manaPoints: {
-          type: Number,
-          required: true
-        },
-        maxMana: {
-          type: Number,
-          required: true
-        },
-      },
-      data() {
-        return {
+export default {
+  props: {
+    manaPoints: {
+      type: Number,
+      required: true,
+    },
+    maxMana: {
+      type: Number,
+      required: true,
+    },
+  },
+  data() {
+    return {
 
-        }
-      },
-      computed: {
-        getManaPointStyle(){
-          let manaPointsPercentage = (this.manaPoints / this.maxMana) * 100;
-          if(manaPointsPercentage <= 0)
-          {
-            manaPointsPercentage = 0;
-          }
-          return {
-            width: manaPointsPercentage + '%'
-          }
-        }
-      },
-      created(){
-
+    };
+  },
+  computed: {
+    getManaPointStyle() {
+      let manaPointsPercentage = (this.manaPoints / this.maxMana) * 100;
+      if (manaPointsPercentage <= 0) {
+        manaPointsPercentage = 0;
       }
-    }
+      return {
+        width: `${manaPointsPercentage}%`,
+      };
+    },
+  },
+  created() {
+
+  },
+};
 </script>
 
 <style scoped>

@@ -8,7 +8,7 @@ export default class RaidMemberModel {
     this.classification = raidMember.classification;
     this.damageValue = raidMember.damageValue;
     this.healingValue = raidMember.healingValue;
-  };
+  }
 
   getId() {
     return this.id;
@@ -57,15 +57,15 @@ export default class RaidMemberModel {
     this.isTargeted = isTargeted;
   }
 
-  getClassification(){
+  getClassification() {
     return this.classification;
   }
 
-  getHealingValue(){
+  getHealingValue() {
     return this.healingValue;
   }
 
-  getDamageValue(){
+  getDamageValue() {
     return this.damageValue;
   }
 }

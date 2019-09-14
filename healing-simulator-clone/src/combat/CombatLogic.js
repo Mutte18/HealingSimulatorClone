@@ -1,39 +1,39 @@
-import {classifications} from "../raiderClassifications";
+import { classifications } from '../raiderClassifications';
 
 export const CombatLogic = {
-  npcHealRaiders: function(raidMembers){
-    raidMembers.forEach(raider => {
-      if(raider.getClassification() === classifications.HEALER && raider.getIsAlive()){
+  npcHealRaiders(raidMembers) {
+    raidMembers.forEach((raider) => {
+      if (raider.getClassification() === classifications.HEALER && raider.getIsAlive()) {
         healRaider(raidMembers);
       }
-    })
+    });
   },
-  raidersInflictDamage: function(raidMembers){
+  raidersInflictDamage(raidMembers) {
     let damage = 0;
-    raidMembers.forEach(raider => {
-      if(raider.getIsAlive()){
+    raidMembers.forEach((raider) => {
+      if (raider.getIsAlive()) {
         damage += raider.getDamageValue();
       }
     });
     return damage;
   },
-  bossCauseDamage: function(raidMembers){
-    raidMembers.forEach(raider => {
-      if(raider.getIsAlive()){
+  bossCauseDamage(raidMembers) {
+    raidMembers.forEach((raider) => {
+      if (raider.getIsAlive()) {
 
       }
-    })
-  }
+    });
+  },
 };
 
-function healRaider(raidMembers){
-  raidMembers.forEach(raider => {
-    if(raider.getIsAlive()){
+function healRaider(raidMembers) {
+  raidMembers.forEach((raider) => {
+    if (raider.getIsAlive()) {
       raider.increaseHealthPoints(10);
     }
-  })
+  });
 }
 
-function raiderDealDamage(bossHealth){
+function raiderDealDamage(bossHealth) {
   return 1;
 }

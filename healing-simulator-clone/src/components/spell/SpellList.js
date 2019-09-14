@@ -1,5 +1,5 @@
 export const SpellList = {
-  initializeSpells(){
+  initializeSpells() {
     return [
       {
         name: spellNames.HEAL,
@@ -9,7 +9,7 @@ export const SpellList = {
         castTime: 2000,
         cooldown: 5,
         targetAmount: 1,
-        isHovered: false
+        isHovered: false,
       },
       {
         name: spellNames.FLASH_HEAL,
@@ -19,7 +19,7 @@ export const SpellList = {
         castTime: 1500,
         cooldown: 3,
         targetAmount: 1,
-        isHovered: false
+        isHovered: false,
       },
       {
         name: spellNames.CIRCLE_OF_HEALING,
@@ -29,7 +29,7 @@ export const SpellList = {
         castTime: 1000,
         cooldown: 4,
         targetAmount: 4,
-        isHovered: false
+        isHovered: false,
       },
       {
         name: spellNames.RENEW,
@@ -39,7 +39,7 @@ export const SpellList = {
         castTime: 0,
         cooldown: 1,
         targetAmount: 1,
-        isHovered: false
+        isHovered: false,
       },
       {
         name: spellNames.DISPEL,
@@ -49,7 +49,7 @@ export const SpellList = {
         castTime: 0,
         cooldown: 1,
         targetAmount: 1,
-        isHovered: false
+        isHovered: false,
       },
       {
         name: spellNames.HOLY_SHOCK,
@@ -59,10 +59,10 @@ export const SpellList = {
         castTime: 0,
         cooldown: 5,
         targetAmount: 1,
-        isHovered: false
-      }
+        isHovered: false,
+      },
     ];
-  }
+  },
 };
 
 export const spellNames = {
@@ -71,5 +71,5 @@ export const spellNames = {
   CIRCLE_OF_HEALING: 'Circle of Healing',
   RENEW: 'Renew',
   DISPEL: 'Dispel',
-  HOLY_SHOCK: 'Holy Shock'
+  HOLY_SHOCK: 'Holy Shock',
 };

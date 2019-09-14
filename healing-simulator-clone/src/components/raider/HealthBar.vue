@@ -12,89 +12,88 @@
 </template>
 
 <script>
-    import {classifications} from "../../raiderClassifications";
+import { classifications } from '../../raiderClassifications';
 
-    export default {
-      props: {
-        healthPoints: {
-          type: Number,
-          required: true
-        },
-        maxHealth: {
-          type: Number,
-          required: true
-        },
-        isAlive: {
-          type: Boolean,
-          required: true
-        },
-        classification: {
-          type: String,
-          required: true
-        }
-      },
-      data() {
+export default {
+  props: {
+    healthPoints: {
+      type: Number,
+      required: true,
+    },
+    maxHealth: {
+      type: Number,
+      required: true,
+    },
+    isAlive: {
+      type: Boolean,
+      required: true,
+    },
+    classification: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
+    return {
+
+    };
+  },
+  methods: {
+    getHealthPercentage() {
+      return (this.healthPoints / this.maxHealth) * 100;
+    },
+  },
+  computed: {
+    getHealthPointStyle() {
+      let backgroundColor = '';
+      if (this.getHealthPercentage() > 75) {
+        backgroundColor = 'green';
+      } else if (this.getHealthPercentage() > 50) {
+        backgroundColor = 'lightgreen';
+      } else if (this.getHealthPercentage() > 25) {
+        backgroundColor = 'yellow';
+      } else if (this.getHealthPercentage() > 0) {
+        backgroundColor = 'red';
+      }
+      return {
+        backgroundColor,
+        width: `${this.getHealthPercentage()}%`,
+      };
+    },
+    getClassHealthbars() {
+      let backgroundColor = '';
+      switch (this.classification) {
+        case classifications.TANK:
+          backgroundColor = 'saddlebrown';
+          break;
+        case classifications.HEALER:
+          backgroundColor = 'darkgoldenrod';
+          break;
+        case classifications.DPS:
+          backgroundColor = 'green';
+          break;
+        case classifications.YOU:
+          backgroundColor = 'teal';
+          break;
+      }
+      return {
+        backgroundColor,
+        width: `${this.getHealthPercentage()}%`,
+      };
+    },
+    getIsAliveBackgroundColorStatus() {
+      if (this.isAlive) {
         return {
+          backgroundColor: 'lightgray',
+        };
+      }
 
-        }
-      },
-      methods: {
-        getHealthPercentage(){
-          return (this.healthPoints / this.maxHealth) * 100;
-        }
-      },
-      computed: {
-        getHealthPointStyle() {
-          let backgroundColor = '';
-          if (this.getHealthPercentage() > 75) {
-            backgroundColor = 'green';
-          } else if (this.getHealthPercentage() > 50) {
-            backgroundColor = 'lightgreen';
-          } else if (this.getHealthPercentage() > 25) {
-            backgroundColor = 'yellow';
-          } else if (this.getHealthPercentage() > 0) {
-            backgroundColor = 'red';
-          }
-          return {
-            backgroundColor: backgroundColor,
-            width: this.getHealthPercentage() + '%'
-          }
-        },
-        getClassHealthbars(){
-          let backgroundColor = '';
-          switch(this.classification){
-            case classifications.TANK:
-              backgroundColor = 'saddlebrown';
-              break;
-            case classifications.HEALER:
-              backgroundColor = 'darkgoldenrod';
-              break;
-            case classifications.DPS:
-              backgroundColor = 'green';
-              break;
-            case classifications.YOU:
-              backgroundColor = 'teal';
-              break;
-          }
-          return {
-            backgroundColor: backgroundColor,
-            width: this.getHealthPercentage() + '%'
-          }
-        },
-        getIsAliveBackgroundColorStatus(){
-          if(this.isAlive){
-            return {
-              backgroundColor: 'lightgray'
-            }
-          }
-          else {
-            return {
-              backgroundColor: 'dimgray'
-            }
-          }
-        },
-      },
-    }
+      return {
+        backgroundColor: 'dimgray',
+      };
+    },
+  },
+};
 </script>
 
 <style scoped>

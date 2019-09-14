@@ -22,49 +22,49 @@
 </template>
 
 <script>
-  import SpellDescription from "./SpellDescription";
+import SpellDescription from './SpellDescription';
 
-  export default {
-    props: {
-      spellObject: {
-        type: Object,
-        required: true
-      },
-      spellBarIndex: {
-        type: Number,
-        required: true
-      },
-      internalCooldownActive: {
-        type: Boolean,
-        required: true
-      },
+export default {
+  props: {
+    spellObject: {
+      type: Object,
+      required: true,
     },
-    data() {
-      return {
-        remainingCooldown: this.spellObject.cooldown,
-        onCooldown: false
-      }
+    spellBarIndex: {
+      type: Number,
+      required: true,
     },
-    components: {
-      'spell-description': SpellDescription
+    internalCooldownActive: {
+      type: Boolean,
+      required: true,
     },
-    methods: {
-      startCooldown(){
-        this.onCooldown = true;
-        setInterval(() => {
-          this.remainingCooldown -= 1;
-          if(this.remainingCooldown <= 0){
-            clearInterval();
-            this.remainingCooldown = this.spellObject.cooldown;
-            this.onCooldown = false;
-          }
-        }, 1000)
-      }
+  },
+  data() {
+    return {
+      remainingCooldown: this.spellObject.cooldown,
+      onCooldown: false,
+    };
+  },
+  components: {
+    'spell-description': SpellDescription,
+  },
+  methods: {
+    startCooldown() {
+      this.onCooldown = true;
+      setInterval(() => {
+        this.remainingCooldown -= 1;
+        if (this.remainingCooldown <= 0) {
+          clearInterval();
+          this.remainingCooldown = this.spellObject.cooldown;
+          this.onCooldown = false;
+        }
+      }, 1000);
     },
-    created(){
-      this.startCooldown();
-    }
-  }
+  },
+  created() {
+    this.startCooldown();
+  },
+};
 </script>
 
 <style scoped>
