@@ -1,5 +1,4 @@
 import { EventBus } from '../../main';
-import { Player } from '../player/Player';
 
 let castTimeout;
 

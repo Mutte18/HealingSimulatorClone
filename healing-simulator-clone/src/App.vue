@@ -7,6 +7,9 @@
         :current-target="boss.currentTarget"
       />
     </div>
+    <app-error-message v-if="errorMessage"
+      :error-message="errorMessage"
+      />
     <div class="container">
       <div class="raid-frame">
         <div class=inner-raid-frame>
@@ -67,6 +70,7 @@
 
 <script>
 import RaidMember from './components/raider/RaidMember.vue';
+import ErrorMessage from './components/errors/ErrorMessage.vue';
 import { EventBus } from './main';
 import ManaBar from './components/player/ManaBar.vue';
 import Boss from './components/boss/Boss';
@@ -78,12 +82,14 @@ import { ArrayHelper } from './Helpers/ArrayHelper';
 import { BossCombatLogic } from './combat/BossCombatLogic';
 import { RaiderHelper } from './components/raider/RaiderHelper';
 import { SpellList } from './components/spell/SpellList';
+import {ErrorMessages} from "./components/errors/ErrorMessages";
 
 export default {
   data() {
     return {
       raidSize: 20,
       raidMembers: [],
+      errorMessage: '',
       player: {
         target: {
           mouseOverTarget: null,
@@ -161,7 +167,17 @@ export default {
         // this.castSpell(this.spellList[1], target);
       } else {
         console.log('No target');
+        this.setErrorMessage(ErrorMessages.NoTarget);
       }
+    },
+
+    setErrorMessage(errorMessage){
+      this.errorMessage = errorMessage;
+
+      setTimeout(() => {
+        this.errorMessage = null;
+      },1500)
+
     },
 
     startInternalCooldown() {
@@ -366,6 +382,7 @@ export default {
     'app-boss': Boss,
     'app-spell': Spell,
     'app-cast-bar': CastBar,
+    'app-error-message': ErrorMessage
   },
 };
 
