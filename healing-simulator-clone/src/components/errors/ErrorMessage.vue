@@ -3,14 +3,14 @@
 </template>
 
 <script>
-    export default {
-      props: {
-        errorMessage: {
-          type: String,
+export default {
+  props: {
+    errorMessage: {
+      type: String,
 
-        }
-      }
-    }
+    },
+  },
+};
 </script>
 
 <style scoped>

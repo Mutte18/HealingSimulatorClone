@@ -82,7 +82,7 @@ import { ArrayHelper } from './Helpers/ArrayHelper';
 import { BossCombatLogic } from './combat/BossCombatLogic';
 import { RaiderHelper } from './components/raider/RaiderHelper';
 import { SpellList } from './components/spell/SpellList';
-import {ErrorMessages} from "./components/errors/ErrorMessages";
+import { ErrorMessages } from './components/errors/ErrorMessages';
 
 export default {
   data() {
@@ -171,13 +171,12 @@ export default {
       }
     },
 
-    setErrorMessage(errorMessage){
+    setErrorMessage(errorMessage) {
       this.errorMessage = errorMessage;
 
       setTimeout(() => {
         this.errorMessage = null;
-      },1500)
-
+      }, 1500);
     },
 
     startInternalCooldown() {
@@ -382,7 +381,7 @@ export default {
     'app-boss': Boss,
     'app-spell': Spell,
     'app-cast-bar': CastBar,
-    'app-error-message': ErrorMessage
+    'app-error-message': ErrorMessage,
   },
 };
 
