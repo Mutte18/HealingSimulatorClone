@@ -25,14 +25,15 @@ export const SpellLogic = {
     return target
       && target.getIsAlive()
       && !playerSpell.isCasting
-      && checkIfEnoughManaForCast(playerMana, spellObject.manaCost)
+      && this.checkIfEnoughManaForCast(playerMana, spellObject.manaCost)
       && !playerSpell.internalCooldownActive;
   },
+
+  checkIfEnoughManaForCast(playerMana, spellObjectManaCost) {
+    return playerMana - spellObjectManaCost > 0;
+  }
 };
 
-function checkIfEnoughManaForCast(playerMana, spellObjectManaCost) {
-  return playerMana - spellObjectManaCost > 0;
-}
 
 function performSpellAction(spellObject, targetObjects) {
   const healValue = spellObject.healAmount;

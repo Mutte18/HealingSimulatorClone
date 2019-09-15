@@ -46,7 +46,6 @@ export default {
     background-color: lightblue;
     border: solid black 1px;
     color: white;
-
   }
 
   .manaBarText{

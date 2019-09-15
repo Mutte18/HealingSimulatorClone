@@ -148,26 +148,43 @@ export default {
     },
 
     castHeal(spellObject) {
-      let target = null;
-      if (this.player.target.mouseOverTarget) {
-        target = this.player.target.mouseOverTarget;
-      } else if (this.player.target.clickedTarget) {
-        target = this.player.target.clickedTarget;
-      }
-      if (SpellLogic.canCastSpell(target, spellObject, this.player.spell, this.player.mana.manaPoints)) {
-        let targetsToHeal = target;
-        if (spellObject.targetAmount > 1) {
-          targetsToHeal = this.getAoEHealTargets(target, spellObject);
+      if(!this.gameOver) {
+        let target = null;
+        if (this.player.target.mouseOverTarget) {
+          target = this.player.target.mouseOverTarget;
+        } else if (this.player.target.clickedTarget) {
+          target = this.player.target.clickedTarget;
         }
-        this.useMana(spellObject.manaCost);
-        this.player.spell.isCasting = true;
-        this.startInternalCooldown();
-        this.player.spell.spellCurrentlyCasting = spellObject;
-        SpellLogic.castSpell(spellObject, targetsToHeal);
-        // this.castSpell(this.spellList[1], target);
-      } else {
-        console.log('No target');
-        this.setErrorMessage(ErrorMessages.NoTarget);
+        if (SpellLogic.canCastSpell(target, spellObject, this.player.spell, this.player.mana.manaPoints)) {
+          let targetsToHeal = target;
+          if (spellObject.targetAmount > 1) {
+            targetsToHeal = ArrayHelper.getAoEHealTargets(this.raidMembers, target, spellObject);
+          }
+          this.useMana(spellObject.manaCost);
+          this.player.spell.isCasting = true;
+          this.startInternalCooldown();
+          this.player.spell.spellCurrentlyCasting = spellObject;
+          SpellLogic.castSpell(spellObject, targetsToHeal);
+          // this.castSpell(this.spellList[1], target);
+        } else {
+          console.log('No target');
+          this.setErrorMessage(this.getErrorMessageReason(target, spellObject, this.player.spell, this.player.mana.manaPoints));
+        }
+      }
+    },
+    getErrorMessageReason(target, spellObject, playerSpell, playerMana){
+      if (!target){
+        return ErrorMessages.NoTarget;
+      }
+      else if (!target.getIsAlive()){
+        return ErrorMessages.TargetNotAlive;
+      }
+      else if (!SpellLogic.checkIfEnoughManaForCast(playerMana, spellObject.manaCost))
+      {
+        return ErrorMessages.NotEnoughMana;
+      }
+      else if (playerSpell.internalCooldownActive) {
+        return ErrorMessages.OnCooldown;
       }
     },
 
@@ -184,56 +201,6 @@ export default {
       setTimeout(() => {
         this.player.spell.internalCooldownActive = false;
       }, 1000);
-    },
-
-    castAoeHeal() {
-      this.raidMembers.forEach((raidMember) => {
-        if (raidMember.getIsAlive()) {
-          raidMember.increaseHealthPoints(20);
-        }
-      });
-      this.useMana(150);
-    },
-    getLowestHPRaider(unsortedRaiders) {
-      let lowest = unsortedRaiders[0];
-      for (let i = 1; i < unsortedRaiders.length; i++) {
-        if (unsortedRaiders[i].healthPoints < lowest.healthPoints) {
-          lowest = unsortedRaiders[i];
-        }
-      }
-      return lowest;
-    },
-    getAoEHealTargets(target, spellObject) {
-      // This should return 4 of the raiders with the lowest amount of hp, that are still alive
-      let raiders = Array.from(this.raidMembers);
-      raiders.splice(raiders.indexOf(target), 1);
-      raiders = ArrayHelper.shuffleArray(raiders);
-
-      // Remove the raiders that are dead or are on 0 hp. So that they are not chosen as heal targets
-      for (let i = 0; i < raiders.length; i++) {
-        const raider = raiders[i];
-        if (raider !== undefined) {
-          if (!raider.getIsAlive() || raider.getHealthPoints() <= 0) {
-            const index = raiders.indexOf(raiders[i]);
-            if (index !== -1) {
-              console.log(raiders.splice(index, 1));
-              i--;
-            }
-          }
-        }
-      }
-
-      const healingTargets = [];
-      for (let i = 0; i < spellObject.targetAmount; i++) {
-        const lowestHpRaider = this.getLowestHPRaider(raiders);
-        if (lowestHpRaider !== undefined) {
-          healingTargets.push(lowestHpRaider);
-          raiders.splice(raiders.indexOf(lowestHpRaider), 1);
-        }
-      }
-      healingTargets.push(target);
-      console.log(healingTargets);
-      return healingTargets;
     },
 
     useMana(manaCost) {
@@ -266,22 +233,6 @@ export default {
         });
       }, interval);
     },
-    checkRaidAliveStatus() {
-      const intervalID = setInterval(() => {
-        let entireRaidIsDead = true;
-        this.raidMembers.forEach((raidMember) => {
-          if (raidMember.getIsAlive()) {
-            entireRaidIsDead = false;
-          }
-        });
-        if (entireRaidIsDead) {
-          this.gameOver = true;
-          /*
-            STOP THE INTERVAL THIG HERE TO SET GAMEOVER OT ANYMORE
-             */
-        }
-      });
-    },
     restorePeriodicMana(manaRegenRate) {
       setInterval(() => {
         this.regenMana(this.player.mana.manaRegenAmount);
@@ -296,24 +247,37 @@ export default {
       });
     },
     checkKeyPressed(event) {
-      if (event.key === '1') {
-        this.castHeal(this.spellList[0]);
-      } else if (event.key === '2') {
-        this.castHeal(this.spellList[1]);
-      } else if (event.key === '3') {
-        this.castHeal(this.spellList[2]);
-      } else if (event.key === '4') {
-        this.castHeal(this.spellList[3]);
-      } else if (event.key === '5') {
-        this.castHeal(this.spellList[4]);
-      } else if (event.key === '6') {
-        this.castHeal(this.spellList[5]);
-      } else if (event.key === 'Escape') {
-        this.cancelCast();
-      } else if (event.key === 'z') {
-        this.killRandomPlayers(14, this.raidMembers);
-      } else if (event.key === 'x') {
-        this.resetGame();
+      switch(event.key){
+        case '1':
+          this.castHeal(this.spellList[0]);
+          break;
+        case '2':
+          this.castHeal(this.spellList[1]);
+          break;
+        case '3':
+          this.castHeal(this.spellList[2]);
+          break;
+        case '4':
+          this.castHeal(this.spellList[3]);
+          break;
+        case '5':
+          this.castHeal(this.spellList[4]);
+          break;
+        case '6':
+          this.castHeal(this.spellList[5]);
+          break;
+        case 'Escape':
+          this.cancelCast();
+          break;
+        case 'z':
+          this.killRandomPlayers(14, this.raidMembers);
+          break;
+        case 'x':
+          this.resetGame();
+          break;
+        case 'q':
+          ArrayHelper.dealInstantRaidDamage(this.raidMembers);
+          break;
       }
     },
     cancelCast() {
@@ -359,6 +323,20 @@ export default {
     bossAutoHit() {
       setInterval(() => BossCombatLogic.bossNormalAttack(this.raidMembers, this.boss), 1000);
     },
+    checkGameOver(){
+      let entireRaidIsDead = true;
+      this.raidMembers.forEach((raidMember) => {
+        if (raidMember.getIsAlive()) {
+          entireRaidIsDead = false;
+        }
+      });
+      if (entireRaidIsDead) {
+        this.gameOver = true;
+      }
+    },
+    listenForDeadRaiderEvents(){
+      EventBus.$on('raiderDied', this.checkGameOver);
+    },
   },
 
 
@@ -371,6 +349,7 @@ export default {
     this.dpsDealDamageToBossEverySecond();
     this.bossAutoHit();
     this.restorePeriodicMana(this.player.mana.manaRegenRate);
+    this.listenForDeadRaiderEvents();
     EventBus.$on('spellCastFinish', () => {
       this.finishSpellCast();
     });
@@ -384,8 +363,6 @@ export default {
     'app-error-message': ErrorMessage,
   },
 };
-
-
 </script>
 
 <style>

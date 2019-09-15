@@ -1,3 +1,5 @@
+import {EventBus} from "./main";
+
 export default class RaidMemberModel {
   constructor(raidMember = {}) {
     this.id = raidMember.id;
@@ -23,7 +25,12 @@ export default class RaidMemberModel {
     if (this.healthPoints <= 0) {
       this.healthPoints = 0;
       this.isAlive = false;
+      this.sendIsDeadEvent();
     }
+  }
+
+  sendIsDeadEvent(){
+    EventBus.$emit('raiderDied');
   }
 
   increaseHealthPoints(healthValue) {
