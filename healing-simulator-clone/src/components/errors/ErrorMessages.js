@@ -3,4 +3,5 @@ export const ErrorMessages = {
   TargetNotAlive: 'Your target is not alive',
   NotEnoughMana: 'Insufficent Mana',
   OnCooldown: 'Spell is still on cooldown',
+  GameOver: 'GAME OVER - PRESS [X] To try again!'
 };

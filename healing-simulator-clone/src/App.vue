@@ -7,9 +7,11 @@
         :current-target="boss.currentTarget"
       />
     </div>
-    <app-error-message v-if="errorMessage"
+    <div style="min-height: 50px" class="container">
+    <app-error-message
       :error-message="errorMessage"
       />
+    </div>
     <div class="container">
       <div class="raid-frame">
         <div class=inner-raid-frame>
@@ -312,7 +314,9 @@ export default {
         raidMember.setHealthPoints(raidMember.getMaxHealth());
         this.player.mana.manaPoints = this.player.mana.maxMana;
       });
+      this.errorMessage = '';
       this.gameOver = false;
+
     },
     npcHealRaidersEveryFiveSeconds() {
       setInterval(() => CombatLogic.npcHealRaiders(this.raidMembers), 1000);
@@ -332,6 +336,7 @@ export default {
       });
       if (entireRaidIsDead) {
         this.gameOver = true;
+        this.errorMessage = ErrorMessages.GameOver;
       }
     },
     listenForDeadRaiderEvents(){

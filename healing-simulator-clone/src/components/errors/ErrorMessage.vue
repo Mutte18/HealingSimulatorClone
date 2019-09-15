@@ -1,5 +1,7 @@
 <template>
+  <transition name="fade">
     <p> {{ errorMessage }}</p>
+  </transition>
 </template>
 
 <script>
@@ -16,7 +18,13 @@ export default {
 <style scoped>
   p {
     color: red;
-    display: flex;
-    justify-content: center;
+    position: relative;
+  }
+
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity 1s;
+  }
+  .fade-leave-to, .fade-enter /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
   }
 </style>
