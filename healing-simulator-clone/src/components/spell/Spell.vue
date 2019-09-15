@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import SpellDescription from './SpellDescription';
+import SpellDescription from './SpellDescription.vue';
 
 export default {
   props: {

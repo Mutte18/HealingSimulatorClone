@@ -296,23 +296,23 @@ export default {
       });
     },
     checkKeyPressed(event) {
-      if (event.key == '1') {
+      if (event.key === '1') {
         this.castHeal(this.spellList[0]);
-      } else if (event.key == '2') {
+      } else if (event.key === '2') {
         this.castHeal(this.spellList[1]);
-      } else if (event.key == '3') {
+      } else if (event.key === '3') {
         this.castHeal(this.spellList[2]);
-      } else if (event.key == '4') {
+      } else if (event.key === '4') {
         this.castHeal(this.spellList[3]);
-      } else if (event.key == '5') {
+      } else if (event.key === '5') {
         this.castHeal(this.spellList[4]);
-      } else if (event.key == '6') {
+      } else if (event.key === '6') {
         this.castHeal(this.spellList[5]);
-      } else if (event.key == 'Escape') {
+      } else if (event.key === 'Escape') {
         this.cancelCast();
-      } else if (event.key == 'z') {
+      } else if (event.key === 'z') {
         this.killRandomPlayers(14, this.raidMembers);
-      } else if (event.key == 'x') {
+      } else if (event.key === 'x') {
         this.resetGame();
       }
     },
