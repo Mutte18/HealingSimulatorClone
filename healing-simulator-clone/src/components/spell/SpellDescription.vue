@@ -31,6 +31,9 @@ export default {
     border: 1px black solid;
     border-radius: 15px;
     text-align: center;
+    text-overflow-mode: true;
+    margin-top: 10px;
+    padding: 0 10px 0 10px;
   }
 
 </style>
