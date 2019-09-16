@@ -1,5 +1,5 @@
 <template>
-  <transition name="fade">
+  <transition name="fade" mode="in-out">
     <p> {{ errorMessage }}</p>
   </transition>
 </template>
@@ -21,10 +21,13 @@ export default {
     position: relative;
   }
 
-  .fade-enter-active, .fade-leave-active {
-    transition: opacity 1s;
+  .fade-enter, .fade-leave-to {
+    transition: opacity 0.5s;
   }
-  .fade-leave-to, .fade-enter /* .fade-leave-active below version 2.1.8 */ {
+  .fade-leave-active {
+    position: absolute;
+  }
+  .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;
   }
 </style>

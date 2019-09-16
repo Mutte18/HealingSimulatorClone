@@ -8,7 +8,7 @@
       />
     </div>
     <div style="min-height: 50px" class="container">
-    <app-error-message
+    <app-error-message v-if="errorMessageActive"
       :error-message="errorMessage"
       />
     </div>
@@ -118,6 +118,8 @@ export default {
         currentTarget: null,
       },
       gameOver: false,
+      errorMessageActive: false,
+      errorMessageTimeout: null
     };
   },
 
@@ -188,14 +190,22 @@ export default {
       else if (playerSpell.internalCooldownActive) {
         return ErrorMessages.OnCooldown;
       }
+      else {
+        return null;
+      }
     },
 
     setErrorMessage(errorMessage) {
-      this.errorMessage = errorMessage;
-
-      setTimeout(() => {
-        this.errorMessage = null;
-      }, 1500);
+      if (errorMessage) {
+        this.errorMessage = errorMessage;
+      }
+      if(!this.errorMessageActive) {
+          this.errorMessageActive = true;
+          this.errorMessageTimeout = setTimeout(() => {
+            window.clearTimeout(this.errorMessageTimeout);
+            this.errorMessageActive = false;
+          }, 1500);
+      }
     },
 
     startInternalCooldown() {
@@ -270,6 +280,7 @@ export default {
           break;
         case 'Escape':
           this.cancelCast();
+          this.setErrorMessage("kuken");
           break;
         case 'z':
           this.killRandomPlayers(14, this.raidMembers);
@@ -285,7 +296,7 @@ export default {
     cancelCast() {
       if (this.player.spell.isCasting) {
         EventBus.$emit('cancelCast');
-        this.refundMana(this.spellCurrentlyCasting.manaCost);
+        this.refundMana(this.player.spell.spellCurrentlyCasting.manaCost);
         SpellLogic.cancelCast();
         this.player.spell.isCasting = false;
         this.player.spell.internalCooldownActive = false;
@@ -313,8 +324,9 @@ export default {
         raidMember.setIsAlive(true);
         raidMember.setHealthPoints(raidMember.getMaxHealth());
         this.player.mana.manaPoints = this.player.mana.maxMana;
+        this.boss.healthPoints = this.boss.maxHealthPoints;
       });
-      this.errorMessage = '';
+      this.setErrorMessage('');
       this.gameOver = false;
 
     },
@@ -336,7 +348,7 @@ export default {
       });
       if (entireRaidIsDead) {
         this.gameOver = true;
-        this.errorMessage = ErrorMessages.GameOver;
+        this.setErrorMessage(ErrorMessages.GameOver);
       }
     },
     listenForDeadRaiderEvents(){
@@ -350,9 +362,9 @@ export default {
     this.spellList = SpellList.initializeSpells();
     this.setUpKeyListener();
     // this.inflictPeriodicDamage(1200);
-    this.npcHealRaidersEveryFiveSeconds();
+    //this.npcHealRaidersEveryFiveSeconds();
     this.dpsDealDamageToBossEverySecond();
-    this.bossAutoHit();
+    //this.bossAutoHit();
     this.restorePeriodicMana(this.player.mana.manaRegenRate);
     this.listenForDeadRaiderEvents();
     EventBus.$on('spellCastFinish', () => {

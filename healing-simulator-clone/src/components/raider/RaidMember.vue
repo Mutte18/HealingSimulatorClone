@@ -82,6 +82,7 @@ export default {
     border: 1px solid black;
     float: left;
     margin-left: 1px;
+    cursor: cell;
   }
 
   .targeted {
