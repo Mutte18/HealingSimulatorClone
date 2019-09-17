@@ -151,7 +151,7 @@ export default {
       this.raidMembers[index].reduceHealthPoints(15);
     },
 
-    castHeal(spellObject) {
+    castSpell(spellObject) {
       if(!this.gameOver) {
         let target = null;
         if (this.player.target.mouseOverTarget) {
@@ -159,18 +159,15 @@ export default {
         } else if (this.player.target.clickedTarget) {
           target = this.player.target.clickedTarget;
         }
-        if (SpellLogic.canCastSpell(target, spellObject, this.player.spell, this.player.mana.manaPoints)) {
-          let targetsToHeal = target;
-          if (spellObject.targetAmount > 1) {
-            targetsToHeal = ArrayHelper.getAoEHealTargets(this.raidMembers, target, spellObject);
-          }
-          this.useMana(spellObject.manaCost);
-          this.player.spell.isCasting = true;
-          this.startInternalCooldown();
-          this.player.spell.spellCurrentlyCasting = spellObject;
-          SpellLogic.castSpell(spellObject, targetsToHeal);
-          // this.castSpell(this.spellList[1], target);
-        } else {
+        let castResult = SpellLogic.castSpell(
+          target,
+          spellObject,
+          this.player.spell.isCasting,
+          this.player.spell.internalCooldownActive,
+          this.player.mana.manaPoints,
+          this.raidMembers
+        );
+        if (!castResult) {
           console.log('No target');
           this.setErrorMessage(this.getErrorMessageReason(target, spellObject, this.player.spell, this.player.mana.manaPoints));
         }
@@ -261,22 +258,22 @@ export default {
     checkKeyPressed(event) {
       switch(event.key){
         case '1':
-          this.castHeal(this.spellList[0]);
+          this.castSpell(this.spellList[0]);
           break;
         case '2':
-          this.castHeal(this.spellList[1]);
+          this.castSpell(this.spellList[1]);
           break;
         case '3':
-          this.castHeal(this.spellList[2]);
+          this.castSpell(this.spellList[2]);
           break;
         case '4':
-          this.castHeal(this.spellList[3]);
+          this.castSpell(this.spellList[3]);
           break;
         case '5':
-          this.castHeal(this.spellList[4]);
+          this.castSpell(this.spellList[4]);
           break;
         case '6':
-          this.castHeal(this.spellList[5]);
+          this.castSpell(this.spellList[5]);
           break;
         case 'Escape':
           this.cancelCast();
@@ -296,7 +293,6 @@ export default {
     cancelCast() {
       if (this.player.spell.isCasting) {
         EventBus.$emit('cancelCast');
-        this.refundMana(this.player.spell.spellCurrentlyCasting.manaCost);
         SpellLogic.cancelCast();
         this.player.spell.isCasting = false;
         this.player.spell.internalCooldownActive = false;
@@ -315,9 +311,17 @@ export default {
         this.player.mana.manaPoints = this.player.mana.maxMana;
       }
     },
-    finishSpellCast() {
+    finishSpellCast(spellObject) {
+      if (spellObject) {
+        this.useMana(spellObject.manaCost);
+      }
       this.player.spell.isCasting = false;
       this.player.spell.spellCurrentlyCasting = null;
+    },
+    startSpellCast(spellObject){
+      this.player.spell.isCasting = true;
+      this.startInternalCooldown();
+      this.player.spell.spellCurrentlyCasting = spellObject;
     },
     resetGame() {
       this.raidMembers.forEach((raidMember) => {
@@ -354,6 +358,12 @@ export default {
     listenForDeadRaiderEvents(){
       EventBus.$on('raiderDied', this.checkGameOver);
     },
+    listenForStartSpellCastEvent(){
+      EventBus.$on('startSpellCast', (spellObject) => this.startSpellCast(spellObject));
+    },
+    listenForFinishSpellCastEvent(){
+      EventBus.$on('finishSpellCast', (result) => this.finishSpellCast(result));
+    },
   },
 
 
@@ -367,9 +377,9 @@ export default {
     //this.bossAutoHit();
     this.restorePeriodicMana(this.player.mana.manaRegenRate);
     this.listenForDeadRaiderEvents();
-    EventBus.$on('spellCastFinish', () => {
-      this.finishSpellCast();
-    });
+    this.listenForStartSpellCastEvent();
+    this.listenForFinishSpellCastEvent();
+
   },
   components: {
     'app-raid-member': RaidMember,

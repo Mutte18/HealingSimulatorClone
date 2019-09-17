@@ -52,6 +52,9 @@ export default {
   },
   computed: {},
   created() {
+    EventBus.$on('finishSpellCast', () => {
+      this.finishSpellCast();
+    });
     EventBus.$on('startSpellCast', (spellObject) => {
       if (!this.isCasting) {
         this.isCasting = true;
