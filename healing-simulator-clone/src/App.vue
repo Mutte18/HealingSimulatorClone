@@ -275,6 +275,9 @@ export default {
         case '6':
           this.castSpell(this.spellList[5]);
           break;
+        case '7':
+          this.castSpell(this.spellList[6]);
+          break;
         case 'Escape':
           this.cancelCast();
           this.setErrorMessage("kuken");

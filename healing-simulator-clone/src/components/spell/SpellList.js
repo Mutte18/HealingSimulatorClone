@@ -5,6 +5,7 @@ export const spellNames = {
   RENEW: 'Renew',
   DISPEL: 'Dispel',
   HOLY_SHOCK: 'Holy Shock',
+  BINDING_HEAL: 'Binding Heal'
 };
 
 export const SpellList = {
@@ -17,7 +18,7 @@ export const SpellList = {
         manaCost: 50,
         castTime: 2000,
         cooldown: 5,
-        targetAmount: 1,
+        extraTargets: 0,
         isHovered: false,
       },
       {
@@ -27,7 +28,7 @@ export const SpellList = {
         manaCost: 90,
         castTime: 1500,
         cooldown: 3,
-        targetAmount: 1,
+        extraTargets: 0,
         isHovered: false,
       },
       {
@@ -37,7 +38,7 @@ export const SpellList = {
         manaCost: 150,
         castTime: 1000,
         cooldown: 4,
-        targetAmount: 4,
+        extraTargets: 4,
         isHovered: false,
       },
       {
@@ -47,7 +48,7 @@ export const SpellList = {
         manaCost: 50,
         castTime: 0,
         cooldown: 1,
-        targetAmount: 1,
+        extraTargets: 0,
         isHovered: false,
       },
       {
@@ -57,7 +58,7 @@ export const SpellList = {
         manaCost: 50,
         castTime: 0,
         cooldown: 1,
-        targetAmount: 1,
+        extraTargets: 0,
         isHovered: false,
       },
       {
@@ -67,7 +68,17 @@ export const SpellList = {
         manaCost: 50,
         castTime: 0,
         cooldown: 5,
-        targetAmount: 1,
+        extraTargets: 0,
+        isHovered: false,
+      },
+      {
+        name: spellNames.BINDING_HEAL,
+        icon: 'dispel.png',
+        healAmount: 125,
+        manaCost: 50,
+        castTime: 500,
+        cooldown: 5,
+        extraTargets: 1,
         isHovered: false,
       },
     ];

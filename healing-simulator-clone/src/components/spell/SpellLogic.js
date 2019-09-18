@@ -8,33 +8,13 @@ export const SpellLogic = {
     if (!this.canCastSpell(target, spellObject, isCasting, internalCooldownActive, playerManaPoints)) {
       return false;
     }
-    if (spellObject.castTime > 0) {
-      emitStartSpellCast(spellObject);
-      castTimeout = setTimeout(() => {
-        const result = performSpellAction(spellObject, getHealingTargets(
-          raidMembers,
-          target,
-          spellObject.targetAmount)
-        );
-        emitFinishSpellCast(result);
-      }, spellObject.castTime);
-    }
-    // TODO HOW CAN I GENERELIZE THIS? APPLY D.R.Y PRINCICPLE
-    else {
-      emitStartSpellCast(spellObject);
-      const result = performSpellAction(spellObject, getHealingTargets(
-        raidMembers,
-        target,
-        spellObject.targetAmount)
-      );
-      emitFinishSpellCast(result);
-    }
+    emitStartSpellCast(spellObject);
+    castTimeout = setTimeout(() => finishSpellCast(target, spellObject, raidMembers), spellObject.castTime);
     return true;
   },
 
   cancelCast() {
     clearTimeout(castTimeout);
-    console.log('clearade timeout');
   },
   canCastSpell(target, spellObject, isCasting, internalCooldownActive, playerMana) {
     return target
@@ -62,6 +42,12 @@ function performSpellAction(spellObject, targetObjects) {
   return spellObject;
 }
 
+function finishSpellCast(target, spellObject, raidMembers) {
+  const targetsToHeal = getHealingTargets(raidMembers, target, spellObject.extraTargets);
+  const result = performSpellAction(spellObject, targetsToHeal);
+  emitFinishSpellCast(result);
+}
+
 function emitFinishSpellCast(spellObject) {
   EventBus.$emit('finishSpellCast', spellObject);
 }
@@ -70,8 +56,8 @@ function emitStartSpellCast(spellObject) {
   EventBus.$emit('startSpellCast', spellObject);
 }
 
-function getHealingTargets(raidMembers, target, targetAmount) {
-  if (targetAmount === 1) {
+function getHealingTargets(raidMembers, target, extraTargets) {
+  if (extraTargets === 0) {
     return [target];
   }
   // This should return 4 of the raiders with the lowest amount of hp, that are still alive
@@ -82,10 +68,10 @@ function getHealingTargets(raidMembers, target, targetAmount) {
 
   // Remove the raiders that are dead or are on 0 hp. So that they are not chosen as heal targets
   const aliveRaiders = raiders.filter((raider) =>
-    raider.getIsAlive() && raider.getHealthPoints() > 0);
+    (raider.getIsAlive() && raider.getHealthPoints() > 0 && !raider.getIsFullHealth()));
 
   const healingTargets = [];
-  for (let i = 0; i < targetAmount; i++) {
+  for (let i = 0; i < extraTargets; i++) {
     const lowestHpRaider = ArrayHelper.getLowestHPRaider(aliveRaiders);
     if (lowestHpRaider !== undefined) {
       healingTargets.push(lowestHpRaider);
@@ -94,6 +80,5 @@ function getHealingTargets(raidMembers, target, targetAmount) {
   }
   //Add the cast target back to the array
   healingTargets.push(target);
-  console.log(healingTargets, "Greger");
   return healingTargets;
 }

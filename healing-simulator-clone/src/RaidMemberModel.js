@@ -29,6 +29,10 @@ export default class RaidMemberModel {
     }
   }
 
+  getIsFullHealth(){
+    return this.healthPoints === this.maxHealth;
+  }
+
   sendIsDeadEvent(){
     EventBus.$emit('raiderDied');
   }
