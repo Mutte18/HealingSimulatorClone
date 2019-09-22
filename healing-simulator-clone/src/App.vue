@@ -2,9 +2,7 @@
   <div>
     <div class="container">
       <app-boss
-        :health-points="boss.healthPoints"
-        :max-health="boss.maxHealthPoints"
-        :current-target="boss.currentTarget"
+        :boss-object="currentBoss"
       />
     </div>
     <div style="min-height: 50px" class="container">
@@ -85,6 +83,8 @@ import { BossCombatLogic } from './combat/BossCombatLogic';
 import { RaiderHelper } from './components/raider/RaiderHelper';
 import { SpellList } from './components/spell/SpellList';
 import { ErrorMessages } from './components/errors/ErrorMessages';
+import BossModel from "./components/boss/BossModel";
+import {BossHelper} from "./components/boss/BossHelper";
 
 export default {
   data() {
@@ -110,13 +110,10 @@ export default {
         },
       },
       spellList: [],
-      boss: {
-        healthPoints: 10000,
-        maxHealthPoints: 10000,
-        minDamage: 50,
-        maxDamage: 200,
-        currentTarget: null,
-      },
+
+      bossList: [],
+      currentBoss: null,
+
       gameOver: false,
       errorMessageActive: false,
       errorMessageTimeout: null
@@ -180,7 +177,7 @@ export default {
       else if (!target.getIsAlive()){
         return ErrorMessages.TargetNotAlive;
       }
-      else if (!SpellLogic.checkIfEnoughManaForCast(playerMana, spellObject.manaCost))
+      else if (!SpellLogic.checkIfEnoughManaForCast(playerMana, spellObject.getManaCost()))
       {
         return ErrorMessages.NotEnoughMana;
       }
@@ -196,12 +193,14 @@ export default {
       if (errorMessage) {
         this.errorMessage = errorMessage;
       }
-      if(!this.errorMessageActive) {
+        if (!this.errorMessageActive) {
           this.errorMessageActive = true;
-          this.errorMessageTimeout = setTimeout(() => {
+          if(!this.gameOver) {
+            this.errorMessageTimeout = setTimeout(() => {
             window.clearTimeout(this.errorMessageTimeout);
             this.errorMessageActive = false;
           }, 1500);
+        }
       }
     },
 
@@ -278,15 +277,17 @@ export default {
         case '7':
           this.castSpell(this.spellList[6]);
           break;
+        case 'g':
+          this.currentBoss.setHealthPoints(this.currentBoss.getHealthPoints() / 2);
+          break;
         case 'Escape':
           this.cancelCast();
-          this.setErrorMessage("kuken");
           break;
         case 'z':
           this.killRandomPlayers(14, this.raidMembers);
           break;
         case 'x':
-          this.resetGame();
+          this.resetGame(true);
           break;
         case 'q':
           ArrayHelper.dealInstantRaidDamage(this.raidMembers);
@@ -316,7 +317,7 @@ export default {
     },
     finishSpellCast(spellObject) {
       if (spellObject) {
-        this.useMana(spellObject.manaCost);
+        this.useMana(spellObject.getManaCost());
       }
       this.player.spell.isCasting = false;
       this.player.spell.spellCurrentlyCasting = null;
@@ -326,25 +327,30 @@ export default {
       this.startInternalCooldown();
       this.player.spell.spellCurrentlyCasting = spellObject;
     },
-    resetGame() {
+    resetGame(fullReset) {
       this.raidMembers.forEach((raidMember) => {
         raidMember.setIsAlive(true);
         raidMember.setHealthPoints(raidMember.getMaxHealth());
-        this.player.mana.manaPoints = this.player.mana.maxMana;
-        this.boss.healthPoints = this.boss.maxHealthPoints;
       });
-      this.setErrorMessage('');
+      this.player.mana.manaPoints = this.player.mana.maxMana;
+      if (fullReset) {
+        this.resetBosses();
+        this.currentBoss = this.bossList[0];
+      }
       this.gameOver = false;
-
+      this.setErrorMessage('');
+      this.errorMessageActive = false;
     },
     npcHealRaidersEveryFiveSeconds() {
       setInterval(() => CombatLogic.npcHealRaiders(this.raidMembers), 1000);
     },
     dpsDealDamageToBossEverySecond() {
-      setInterval(() => this.boss.healthPoints -= CombatLogic.raidersInflictDamage(this.raidMembers), 1000);
+      setInterval(() => this.currentBoss.reduceHealthPoints(CombatLogic.raidersInflictDamage(this.raidMembers)), 1000);
     },
     bossAutoHit() {
-      setInterval(() => BossCombatLogic.bossNormalAttack(this.raidMembers, this.boss), 1000);
+      setInterval(() => BossCombatLogic.bossNormalAttack(
+        this.raidMembers,
+        this.currentBoss), this.currentBoss.getAttackSpeed());
     },
     checkGameOver(){
       let entireRaidIsDead = true;
@@ -358,28 +364,49 @@ export default {
         this.setErrorMessage(ErrorMessages.GameOver);
       }
     },
-    listenForDeadRaiderEvents(){
+    startNextBoss(id) {
+      if (!this.bossList[id + 1]) {
+        this.gameOver = true;
+        this.setErrorMessage(ErrorMessages.GameOver);
+      }
+      else {
+        this.currentBoss = this.bossList[id + 1];
+        this.resetGame(false);
+      }
+    },
+    listenForDeadRaiderEvents() {
       EventBus.$on('raiderDied', this.checkGameOver);
     },
-    listenForStartSpellCastEvent(){
+    listenForStartSpellCastEvent() {
       EventBus.$on('startSpellCast', (spellObject) => this.startSpellCast(spellObject));
     },
-    listenForFinishSpellCastEvent(){
+    listenForFinishSpellCastEvent() {
       EventBus.$on('finishSpellCast', (result) => this.finishSpellCast(result));
     },
+    listenForDeadBossEvents() {
+      EventBus.$on('bossDied', (id) => this.startNextBoss(id));
+    },
+    resetBosses() {
+      this.bossList.forEach((boss) => {
+        boss.resetBoss();
+      })
+    }
   },
 
 
   created() {
     this.raidMembers = RaiderHelper.createRaiders(this.raidSize);
     this.spellList = SpellList.initializeSpells();
+    this.bossList = BossHelper.initBossList();
+    this.currentBoss = this.bossList[0];
     this.setUpKeyListener();
     // this.inflictPeriodicDamage(1200);
     //this.npcHealRaidersEveryFiveSeconds();
     this.dpsDealDamageToBossEverySecond();
-    //this.bossAutoHit();
+    this.bossAutoHit();
     this.restorePeriodicMana(this.player.mana.manaRegenRate);
     this.listenForDeadRaiderEvents();
+    this.listenForDeadBossEvents();
     this.listenForStartSpellCastEvent();
     this.listenForFinishSpellCastEvent();
 
@@ -405,7 +432,7 @@ export default {
     border: 1px solid black;
     display: flex;
     flex-direction: column;
-    width: 550px;
+    min-width: 550px;
     justify-content: left;
     margin-top: 10px;
   }

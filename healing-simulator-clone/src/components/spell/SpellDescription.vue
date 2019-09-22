@@ -1,20 +1,22 @@
 <template>
   <div class="container">
     <div class="spellDescription">
-      <h1> {{ spellObject.name}}</h1>
-      <p> Heals {{ spellObject.extraTargets }} target for {{ spellObject.healAmount }} damage </p>
-      <p> Mana Cost: {{ spellObject.manaCost}}</p>
-      <p> Cooldown: {{ spellObject.cooldown}} s</p>
-      <p> Cast time: {{ (spellObject.castTime / 1000) }} s</p>
+      <h1> {{ spellObject.getName()}}</h1>
+      <p> Heals {{ spellObject.getExtraTargets() }} target for {{ spellObject.getHealAmount() }} damage </p>
+      <p> Mana Cost: {{ spellObject.getManaCost()}}</p>
+      <p> Cooldown: {{ spellObject.getCoolDown()}} s</p>
+      <p> Cast time: {{ (spellObject.getCastTime() / 1000) }} s</p>
     </div>
   </div>
 </template>
 
 <script>
+import SpellModel from "./SpellModel";
+
 export default {
   props: {
     spellObject: {
-      type: Object,
+      type: SpellModel,
       required: true,
     },
   },

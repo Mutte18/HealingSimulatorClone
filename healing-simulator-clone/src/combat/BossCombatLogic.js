@@ -5,11 +5,15 @@ export const BossCombatLogic = {
   bossNormalAttack(raidMembers, boss) {
     let target;
     if (checkBossTargetAliveStatus(boss)) {
-      target = boss.currentTarget;
+      target = boss.getCurrentTarget();
     } else {
       target = retrieveTarget(raidMembers, boss);
     }
-    const damage = getNormalAttackDamage(boss.minDamage, boss.maxDamage);
+    const damage = getNormalAttackDamage(
+      boss.getMinDamage(),
+      boss.getMaxDamage(),
+      boss.getCritChance()
+    );
     if (target !== null) {
       target.reduceHealthPoints(damage);
     }
@@ -47,11 +51,21 @@ function retrieveTarget(raidMembers, boss) {
 }
 
 function setBossTarget(boss, raider) {
-  boss.currentTarget = raider;
+  boss.setCurrentTarget(raider);
 }
 
-function getNormalAttackDamage(minDamage, maxDamage) {
-  return Math.floor(Math.random() * (maxDamage - minDamage + 1) + minDamage);
+function getNormalAttackDamage(minDamage, maxDamage, critChance) {
+  let damage = Math.floor(Math.random() * (maxDamage - minDamage + 1) + minDamage);
+  if (checkIfCrit(critChance)) {
+    damage = damage * 2;
+    console.log("CRIT!");
+  }
+  console.log(damage);
+  return damage;
+}
+
+function checkIfCrit(critChance) {
+  return critChance >= Math.floor(Math.random() * (100 - 1 + 1));
 }
 
 function getAliveRaiders(raidMembers) {

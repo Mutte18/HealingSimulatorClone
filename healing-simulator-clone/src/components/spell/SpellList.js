@@ -1,3 +1,5 @@
+import SpellModel from "./SpellModel";
+
 export const spellNames = {
   HEAL: 'Heal',
   FLASH_HEAL: 'Flash heal',
@@ -11,7 +13,7 @@ export const spellNames = {
 export const SpellList = {
   initializeSpells() {
     return [
-      {
+      new SpellModel({
         name: spellNames.HEAL,
         icon: 'heal.png',
         healAmount: 25,
@@ -20,8 +22,8 @@ export const SpellList = {
         cooldown: 5,
         extraTargets: 0,
         isHovered: false,
-      },
-      {
+      }),
+      new SpellModel({
         name: spellNames.FLASH_HEAL,
         icon: 'flash_heal.png',
         healAmount: 45,
@@ -29,9 +31,8 @@ export const SpellList = {
         castTime: 1500,
         cooldown: 3,
         extraTargets: 0,
-        isHovered: false,
-      },
-      {
+        isHovered: false,}),
+      new SpellModel({
         name: spellNames.CIRCLE_OF_HEALING,
         icon: 'circle_of_healing.png',
         healAmount: 150,
@@ -40,8 +41,8 @@ export const SpellList = {
         cooldown: 4,
         extraTargets: 4,
         isHovered: false,
-      },
-      {
+      }),
+      new SpellModel({
         name: spellNames.RENEW,
         icon: 'renew.png',
         healAmount: -50,
@@ -50,8 +51,8 @@ export const SpellList = {
         cooldown: 1,
         extraTargets: 0,
         isHovered: false,
-      },
-      {
+      },),
+      new SpellModel({
         name: spellNames.DISPEL,
         icon: 'dispel.png',
         healAmount: 10,
@@ -60,8 +61,8 @@ export const SpellList = {
         cooldown: 1,
         extraTargets: 0,
         isHovered: false,
-      },
-      {
+      }),
+      new SpellModel({
         name: spellNames.HOLY_SHOCK,
         icon: 'dispel.png',
         healAmount: 125,
@@ -70,8 +71,8 @@ export const SpellList = {
         cooldown: 5,
         extraTargets: 0,
         isHovered: false,
-      },
-      {
+      }),
+      new SpellModel({
         name: spellNames.BINDING_HEAL,
         icon: 'dispel.png',
         healAmount: 125,
@@ -80,7 +81,7 @@ export const SpellList = {
         cooldown: 5,
         extraTargets: 1,
         isHovered: false,
-      },
+      }),
     ];
   },
 };

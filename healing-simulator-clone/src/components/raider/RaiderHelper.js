@@ -1,6 +1,7 @@
 
-import RaidMemberModel from '../../RaidMemberModel';
+
 import { classifications } from '../../raiderClassifications';
+import RaidMemberModel from "./RaidMemberModel";
 
 export const RaiderHelper = {
   createRaiders(raidSize) {

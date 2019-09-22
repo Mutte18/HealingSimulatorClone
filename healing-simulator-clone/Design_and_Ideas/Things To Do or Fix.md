@@ -79,4 +79,14 @@ Components:
   
   
 
+To do now on bus:
+  * Add boss dead check
+  * Add event emit for boss dead
+  * Add YOU (player) dead check for casting and emit if dead
+  * Add victory screen if boss dies
+  * Add more boss stuff to BossModel, it should be generic
+  * Should be able to add a boss
+  * Add a border surrounding the target that the boss is currently targeting
+  
+
 

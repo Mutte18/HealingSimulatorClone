@@ -3,7 +3,7 @@
   <div class="spell">
     <div class="timer" v-if="internalCooldownActive && !onCooldown">
     </div>
-      <img :src="require(`../../assets/${spellObject.icon}`)"
+      <img :src="require(`../../assets/${spellObject.getIcon()}`)"
            alt=""
            width="50px"
            height="50px"
@@ -12,7 +12,7 @@
       <!--<p v-if="onCooldown" style="font-size: 24px;"> {{ this.remainingCooldown }}</p> -->
 
     <div class="index">{{ spellBarIndex }} </div>
-    <div v-if="spellObject.isHovered">
+    <div v-if="spellObject.getIsHovered()">
       <spell-description
         :spell-object="spellObject"
       />
@@ -23,11 +23,12 @@
 
 <script>
 import SpellDescription from './SpellDescription.vue';
+import SpellModel from "./SpellModel.js";
 
 export default {
   props: {
     spellObject: {
-      type: Object,
+      type: SpellModel,
       required: true,
     },
     spellBarIndex: {
@@ -41,7 +42,7 @@ export default {
   },
   data() {
     return {
-      remainingCooldown: this.spellObject.cooldown,
+      remainingCooldown: this.spellObject.getCoolDown(),
       onCooldown: false,
     };
   },
@@ -55,11 +56,14 @@ export default {
         this.remainingCooldown -= 1;
         if (this.remainingCooldown <= 0) {
           clearInterval();
-          this.remainingCooldown = this.spellObject.cooldown;
+          this.remainingCooldown = this.spellObject.getCoolDown();
           this.onCooldown = false;
         }
       }, 1000);
     },
+    logYo(){
+      console.log(this.spellObject);
+    }
   },
   created() {
     this.startCooldown();
