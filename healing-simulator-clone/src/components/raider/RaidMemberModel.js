@@ -7,6 +7,7 @@ export default class RaidMemberModel {
     this.maxHealth = raidMember.maxHealth;
     this.isAlive = raidMember.isAlive;
     this.isTargeted = raidMember.isTargeted;
+    this.hasBossAggro = raidMember.hasBossAggro;
     this.classification = raidMember.classification;
     this.damageValue = raidMember.damageValue;
     this.healingValue = raidMember.healingValue;
@@ -78,5 +79,13 @@ export default class RaidMemberModel {
 
   getDamageValue() {
     return this.damageValue;
+  }
+
+  getHasBossAggro() {
+    return this.hasBossAggro;
+  }
+
+  setHasBossAggro(value) {
+    this.hasBossAggro = value;
   }
 }

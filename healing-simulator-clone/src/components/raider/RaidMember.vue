@@ -1,14 +1,18 @@
 <template>
   <div>
     <div class="raid-member disable-select outerHpBar"
-         :class="{targeted: isTargeted}"
-
+         :class="[
+          {targeted: raider.getIsTargeted()},
+         ]"
     >
+      <div class="hasBossAggro" v-if="raider.getHasBossAggro()">
+
+      </div>
       <app-health-bar
-        :health-points="healthPoints"
-        :max-health="maxHealth"
-        :is-alive="isAlive"
-        :classification="classification"
+        :health-points="raider.getHealthPoints()"
+        :max-health="raider.getMaxHealth()"
+        :is-alive="raider.getIsAlive()"
+        :classification="raider.getClassification()"
       />
 
     </div>
@@ -19,34 +23,14 @@
 <script>
 import { EventBus } from '../../main';
 import HealthBar from './HealthBar';
+import RaidMemberModel from "./RaidMemberModel";
 
 export default {
   props: {
-    id: {
-      type: Number,
-      required: true,
-    },
-    isTargeted: {
-      type: Boolean,
-      required: true,
-    },
-    healthPoints: {
-      type: Number,
-      required: true,
-    },
-    maxHealth: {
-      type: Number,
-      required: true,
-    },
-    isAlive: {
-      type: Boolean,
-      required: true,
-    },
-    classification: {
-      type: String,
-      required: true,
-    },
-
+    raider: {
+      type: RaidMemberModel,
+      required: true
+    }
   },
   data() {
     return {};
@@ -87,6 +71,12 @@ export default {
 
   .targeted {
     border: solid red 1px;
+  }
+
+  .hasBossAggro {
+    border: 2px solid black;
+    box-shadow: inset 0px 0px 0px 2px red;
+    box-sizing: border-box;
   }
 
   .disable-select {

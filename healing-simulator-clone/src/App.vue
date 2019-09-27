@@ -13,17 +13,12 @@
     <div class="container">
       <div class="raid-frame">
         <div class=inner-raid-frame>
-          <div v-for="(raidMember, index) in raidMembers">
+          <div v-for="raidMember in raidMembers">
             <app-raid-member
-              @click.native="setTarget(index)"
-              @mouseover.native="setMouseOverTarget(index)"
+              @click.native="setTarget(raidMember)"
+              @mouseover.native="setMouseOverTarget(raidMember)"
               @mouseleave.native="clearMouseOverTarget"
-              :id="raidMembers[index].getId()"
-              :is-targeted="raidMembers[index].getIsTargeted()"
-              :health-points="raidMembers[index].getHealthPoints()"
-              :max-health="raidMembers[index].getMaxHealth()"
-              :is-alive="raidMembers[index].getIsAlive()"
-              :classification="raidMembers[index].getClassification()"
+              :raider="raidMember"
             />
           </div>
         </div>
@@ -83,7 +78,6 @@ import { BossCombatLogic } from './combat/BossCombatLogic';
 import { RaiderHelper } from './components/raider/RaiderHelper';
 import { SpellList } from './components/spell/SpellList';
 import { ErrorMessages } from './components/errors/ErrorMessages';
-import BossModel from "./components/boss/BossModel";
 import {BossHelper} from "./components/boss/BossHelper";
 
 export default {
@@ -116,36 +110,37 @@ export default {
 
       gameOver: false,
       errorMessageActive: false,
-      errorMessageTimeout: null
+      errorMessageTimeout: null,
+      bossAutoHitTimer: null,
     };
   },
 
   methods: {
-    setTarget(index) {
+    setTarget(raidMember) {
       this.clearTargets();
-      this.raidMembers[index].setIsTargeted(true);
-      this.player.target.clickedTarget = this.raidMembers[index];
-      this.reduceHealth(index);
+      raidMember.setIsTargeted(true);
+      this.player.target.clickedTarget = raidMember;
+      this.reduceHealth(raidMember);
     },
-    setMouseOverTarget(index) {
-      this.player.target.mouseOverTarget = this.raidMembers[index];
+    setMouseOverTarget(raidMember) {
+      this.player.target.mouseOverTarget = raidMember;
     },
     clearMouseOverTarget() {
       this.player.target.mouseOverTarget = null;
     },
     setHoveredSpell(spell) {
-      spell.isHovered = true;
+      spell.setIsHovered(true)
     },
     clearHoveredSpell(spell) {
-      spell.isHovered = false;
+      spell.setIsHovered(false)
     },
     clearTargets() {
       this.raidMembers.forEach((raidMember) => {
         raidMember.setIsTargeted(false);
       });
     },
-    reduceHealth(index) {
-      this.raidMembers[index].reduceHealthPoints(15);
+    reduceHealth(raidMember) {
+      raidMember.reduceHealthPoints(15);
     },
 
     castSpell(spellObject) {
@@ -336,6 +331,8 @@ export default {
       if (fullReset) {
         this.resetBosses();
         this.currentBoss = this.bossList[0];
+        this.cancelBossAutoHitTimer();
+        this.startbossAutoHitTimer();
       }
       this.gameOver = false;
       this.setErrorMessage('');
@@ -347,10 +344,13 @@ export default {
     dpsDealDamageToBossEverySecond() {
       setInterval(() => this.currentBoss.reduceHealthPoints(CombatLogic.raidersInflictDamage(this.raidMembers)), 1000);
     },
-    bossAutoHit() {
-      setInterval(() => BossCombatLogic.bossNormalAttack(
+    startbossAutoHitTimer() {
+    this.bossAutoHitTimer = setInterval(() => BossCombatLogic.bossNormalAttack(
         this.raidMembers,
         this.currentBoss), this.currentBoss.getAttackSpeed());
+    },
+    cancelBossAutoHitTimer() {
+      clearInterval(this.bossAutoHitTimer);
     },
     checkGameOver(){
       let entireRaidIsDead = true;
@@ -370,7 +370,9 @@ export default {
         this.setErrorMessage(ErrorMessages.GameOver);
       }
       else {
+        this.cancelBossAutoHitTimer();
         this.currentBoss = this.bossList[id + 1];
+        this.startbossAutoHitTimer();
         this.resetGame(false);
       }
     },
@@ -403,7 +405,7 @@ export default {
     // this.inflictPeriodicDamage(1200);
     //this.npcHealRaidersEveryFiveSeconds();
     this.dpsDealDamageToBossEverySecond();
-    this.bossAutoHit();
+    this.startbossAutoHitTimer();
     this.restorePeriodicMana(this.player.mana.manaRegenRate);
     this.listenForDeadRaiderEvents();
     this.listenForDeadBossEvents();

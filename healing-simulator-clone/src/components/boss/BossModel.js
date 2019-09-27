@@ -13,6 +13,7 @@ export default class BossModel {
     this.attackSpeed = boss.attackSpeed;
     this.critChance = boss.critChance;
     this.currentTarget = boss.currentTarget;
+    this.isHovered = boss.isHovered;
   }
 
   getId() {
@@ -100,6 +101,14 @@ export default class BossModel {
   resetBoss() {
     this.healthPoints = this.maxHealth;
     this.isAlive = true;
+  }
+
+  getIsHovered() {
+    return this.isHovered;
+  }
+
+  setIsHovered(value) {
+    this.isHovered = value;
   }
 
 

@@ -1,5 +1,6 @@
 import { classifications } from '../raiderClassifications';
 import { ArrayHelper } from '../Helpers/ArrayHelper';
+import {RaiderHelper} from "../components/raider/RaiderHelper";
 
 export const BossCombatLogic = {
   bossNormalAttack(raidMembers, boss) {
@@ -31,18 +32,18 @@ function retrieveTarget(raidMembers, boss) {
   if (targets.length > 0) {
     for (let i = 0; i < targets.length; i++) {
       let raider = targets[i];
-      console.log(raider.classification);
+      console.log(raider.getClassification());
       // Prioritise attacking tanks
       if (raider.getClassification() === classifications.TANK) {
         console.log(raider, raider.getClassification());
-        setBossTarget(boss, raider);
+        setBossTarget(boss, raider, raidMembers);
         return raider;
       }
       // If no tanks are found, shuffle the targets list to get a random target (tanks are two first in array)
 
       targets = ArrayHelper.shuffleArray(targets);
       raider = targets[i];
-      setBossTarget(boss, raider);
+      setBossTarget(boss, raider, raidMembers);
       return raider;
     }
   }
@@ -50,8 +51,10 @@ function retrieveTarget(raidMembers, boss) {
   return null;
 }
 
-function setBossTarget(boss, raider) {
+function setBossTarget(boss, raider, raidMembers) {
+  RaiderHelper.clearBossAggroTargets(raidMembers);
   boss.setCurrentTarget(raider);
+  raider.setHasBossAggro(true);
 }
 
 function getNormalAttackDamage(minDamage, maxDamage, critChance) {

@@ -42,4 +42,8 @@ export default class SpellModel {
   getIsHovered() {
     return this.isHovered;
   }
+
+  setIsHovered(value) {
+    this.isHovered = value;
+  }
 }

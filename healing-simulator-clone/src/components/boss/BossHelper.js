@@ -13,8 +13,9 @@ export const BossHelper = {
         minDamage: 50,
         maxDamage: 75,
         attackSpeed: 2000,
-        critChance: 0.15,
-        currentTarget: null
+        critChance: 15,
+        currentTarget: null,
+        isHovered: false
     }),
       new BossModel({
         id: 1,
@@ -26,8 +27,9 @@ export const BossHelper = {
         minDamage: 200,
         maxDamage: 400,
         attackSpeed: 3000,
-        critChance: 15,
-        currentTarget: null
+        critChance: 20,
+        currentTarget: null,
+        isHovered: false
       }),
       new BossModel({
         id: 2,
@@ -40,7 +42,8 @@ export const BossHelper = {
         maxDamage: 70,
         attackSpeed: 1250,
         critChance: 50,
-        currentTarget: null
+        currentTarget: null,
+        isHovered: false
       }),
       new BossModel({
         id: 3,
@@ -53,7 +56,8 @@ export const BossHelper = {
         maxDamage: 1000,
         attackSpeed: 2500,
         critChance: 0,
-        currentTarget: null
+        currentTarget: null,
+        isHovered: false
       }),
       new BossModel({
         id: 4,
@@ -64,9 +68,10 @@ export const BossHelper = {
         isAlive: true,
         minDamage: 1000,
         maxDamage: 3000,
-        attackSpeed: 100,
+        attackSpeed: 500,
         critChance: 75,
-        currentTarget: null
+        currentTarget: null,
+        isHovered: false
       }),
     ]
   }

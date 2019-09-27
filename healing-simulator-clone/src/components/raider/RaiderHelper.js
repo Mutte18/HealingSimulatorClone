@@ -53,4 +53,10 @@ export const RaiderHelper = {
     }
     return raidMembers;
   },
+
+  clearBossAggroTargets(raidMembers) {
+    raidMembers.forEach((raider) => {
+      raider.setHasBossAggro(false);
+    })
+  }
 };
