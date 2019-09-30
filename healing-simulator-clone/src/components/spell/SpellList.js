@@ -16,7 +16,7 @@ export const SpellList = {
       new SpellModel({
         name: spellNames.HEAL,
         icon: 'heal.png',
-        healAmount: 25,
+        healAmount: 75,
         manaCost: 50,
         castTime: 2000,
         coolDown: 5,
@@ -26,7 +26,7 @@ export const SpellList = {
       new SpellModel({
         name: spellNames.FLASH_HEAL,
         icon: 'flash_heal.png',
-        healAmount: 45,
+        healAmount: 100,
         manaCost: 90,
         castTime: 1500,
         coolDown: 3,
@@ -65,7 +65,7 @@ export const SpellList = {
       new SpellModel({
         name: spellNames.HOLY_SHOCK,
         icon: 'dispel.png',
-        healAmount: 125,
+        healAmount: 90,
         manaCost: 50,
         castTime: 0,
         coolDown: 5,

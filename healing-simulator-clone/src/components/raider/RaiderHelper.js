@@ -17,26 +17,26 @@ export const RaiderHelper = {
         case 0:
         case 1:
           classification = classifications.TANK;
-          healthPoints = 500;
-          maxHealth = 500;
+          healthPoints = 2000;
+          maxHealth = 2000;
           damageValue = 1;
           break;
         case 2:
           classification = classifications.YOU;
-          healthPoints = 250;
-          maxHealth = 250;
+          healthPoints = 1500;
+          maxHealth = 1500;
           break;
         case 3:
         case 4:
           classification = classifications.HEALER;
-          healthPoints = 200;
-          maxHealth = 200;
+          healthPoints = 1000;
+          maxHealth = 1000;
           healingValue = 20;
           break;
         default:
           classification = classifications.DPS;
-          healthPoints = 150;
-          maxHealth = 150;
+          healthPoints = 800;
+          maxHealth = 800;
           damageValue = 3;
           break;
       }

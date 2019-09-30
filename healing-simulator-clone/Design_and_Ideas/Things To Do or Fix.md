@@ -88,5 +88,13 @@ To do now on bus:
   * Should be able to add a boss
   * Add a border surrounding the target that the boss is currently targeting
   
+Further stuff to add:
+  * Each boss should have their own forms of special attacks that will deal raid wide
+  damage. 
+  * Some cool background to make it a bit more pleasing to look at?
+  * UI fixes for different screens
+  * Add support to be able to try again against the same boss whenever in the same session
+  * Debuffs and Dispelling logic?
+    
 
 

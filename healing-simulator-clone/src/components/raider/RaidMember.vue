@@ -2,12 +2,9 @@
   <div>
     <div class="raid-member disable-select outerHpBar"
          :class="[
-          {targeted: raider.getIsTargeted()},
+          {hasBossAggro: raider.getHasBossAggro()},
          ]"
     >
-      <div class="hasBossAggro" v-if="raider.getHasBossAggro()">
-
-      </div>
       <app-health-bar
         :health-points="raider.getHealthPoints()"
         :max-health="raider.getMaxHealth()"
@@ -52,7 +49,7 @@ export default {
     EventBus.$on('setTarget', (event) => {
       console.log(event);
 
-      this.setTargeted();
+      //this.setTargeted();
     });
   },
 };
@@ -74,9 +71,7 @@ export default {
   }
 
   .hasBossAggro {
-    border: 2px solid black;
-    box-shadow: inset 0px 0px 0px 2px red;
-    box-sizing: border-box;
+    border: solid red 1px;
   }
 
   .disable-select {

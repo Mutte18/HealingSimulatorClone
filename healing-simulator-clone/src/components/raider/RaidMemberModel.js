@@ -35,7 +35,7 @@ export default class RaidMemberModel {
   }
 
   sendIsDeadEvent(){
-    EventBus.$emit('raiderDied');
+    EventBus.$emit('raiderDied', this.getClassification());
   }
 
   increaseHealthPoints(healthValue) {

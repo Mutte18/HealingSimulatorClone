@@ -10,6 +10,7 @@
       :error-message="errorMessage"
       />
     </div>
+
     <div class="container">
       <div class="raid-frame">
         <div class=inner-raid-frame>
@@ -22,19 +23,26 @@
             />
           </div>
         </div>
-        <!--<div v-if="mouseOverTarget">
-          <app-raid-member
-            :id="mouseOverTarget.getId()"
-            :is-targeted="false"
-            :health-points="mouseOverTarget.getHealthPoints()"
-            :max-health="mouseOverTarget.getMaxHealth()"
-            :is-alive="mouseOverTarget.getIsAlive()">
-          </app-raid-member>
-          {{ mouseOverTarget }}
-        </div> -->
+      </div>
 
+      <div class="targetRaidMember">
+        <div v-if="player.target.mouseOverTarget">
+          <span>Current Target: </span>
+          <app-raid-member
+            :raider="player.target.mouseOverTarget">
+            {{ player.target.mouseOverTarget }}
+          </app-raid-member>
+        </div>
+        <div v-else-if="player.target.clickedTarget">
+          <span>Selected Target: </span>
+          <app-raid-member
+            :raider="player.target.clickedTarget">
+            {{ player.target.clickedTarget }}
+          </app-raid-member>
+        </div>
       </div>
     </div>
+
     <div style="min-height: 60px;" class="container">
       <div v-show="player.spell.isCasting">
         <app-cast-bar
@@ -79,6 +87,7 @@ import { RaiderHelper } from './components/raider/RaiderHelper';
 import { SpellList } from './components/spell/SpellList';
 import { ErrorMessages } from './components/errors/ErrorMessages';
 import {BossHelper} from "./components/boss/BossHelper";
+import {classifications} from "./raiderClassifications";
 
 export default {
   data() {
@@ -112,6 +121,7 @@ export default {
       errorMessageActive: false,
       errorMessageTimeout: null,
       bossAutoHitTimer: null,
+      playerIsAlive: true,
     };
   },
 
@@ -145,23 +155,28 @@ export default {
 
     castSpell(spellObject) {
       if(!this.gameOver) {
-        let target = null;
-        if (this.player.target.mouseOverTarget) {
-          target = this.player.target.mouseOverTarget;
-        } else if (this.player.target.clickedTarget) {
-          target = this.player.target.clickedTarget;
+        if (this.playerIsAlive) {
+          let target = null;
+          if (this.player.target.mouseOverTarget) {
+            target = this.player.target.mouseOverTarget;
+          } else if (this.player.target.clickedTarget) {
+            target = this.player.target.clickedTarget;
+          }
+          let castResult = SpellLogic.castSpell(
+            target,
+            spellObject,
+            this.player.spell.isCasting,
+            this.player.spell.internalCooldownActive,
+            this.player.mana.manaPoints,
+            this.raidMembers
+          );
+          if (!castResult) {
+            console.log('No target');
+            this.setErrorMessage(this.getErrorMessageReason(target, spellObject, this.player.spell, this.player.mana.manaPoints));
+          }
         }
-        let castResult = SpellLogic.castSpell(
-          target,
-          spellObject,
-          this.player.spell.isCasting,
-          this.player.spell.internalCooldownActive,
-          this.player.mana.manaPoints,
-          this.raidMembers
-        );
-        if (!castResult) {
-          console.log('No target');
-          this.setErrorMessage(this.getErrorMessageReason(target, spellObject, this.player.spell, this.player.mana.manaPoints));
+        else {
+          this.setErrorMessage(ErrorMessages.PlayerNotAlive);
         }
       }
     },
@@ -337,6 +352,7 @@ export default {
       this.gameOver = false;
       this.setErrorMessage('');
       this.errorMessageActive = false;
+      this.playerIsAlive = true;
     },
     npcHealRaidersEveryFiveSeconds() {
       setInterval(() => CombatLogic.npcHealRaiders(this.raidMembers), 1000);
@@ -359,15 +375,26 @@ export default {
           entireRaidIsDead = false;
         }
       });
-      if (entireRaidIsDead) {
-        this.gameOver = true;
-        this.setErrorMessage(ErrorMessages.GameOver);
+      return entireRaidIsDead;
+    },
+    setGameIsOver() {
+      this.gameOver = true;
+      this.cancelBossAutoHitTimer();
+      this.setErrorMessage(ErrorMessages.GameOver);
+    },
+    checkPlayerDied(classification) {
+      if (classification === classifications.YOU) {
+        this.disablePlayerFunctions();
       }
+    },
+    disablePlayerFunctions() {
+      this.playerIsAlive = false;
     },
     startNextBoss(id) {
       if (!this.bossList[id + 1]) {
         this.gameOver = true;
         this.setErrorMessage(ErrorMessages.GameOver);
+        this.cancelBossAutoHitTimer();
       }
       else {
         this.cancelBossAutoHitTimer();
@@ -377,7 +404,14 @@ export default {
       }
     },
     listenForDeadRaiderEvents() {
-      EventBus.$on('raiderDied', this.checkGameOver);
+      EventBus.$on('raiderDied', (classification) => {
+        if(this.checkPlayerDied(classification)) {
+          this.disablePlayerFunctions();
+        }
+        if(this.checkGameOver()) {
+          this.setGameIsOver();
+        }
+      });
     },
     listenForStartSpellCastEvent() {
       EventBus.$on('startSpellCast', (spellObject) => this.startSpellCast(spellObject));
@@ -428,6 +462,11 @@ export default {
   .container {
     display: flex;
     justify-content: center;
+  }
+
+  .targetRaidMember {
+    position: absolute;
+    margin-left: -25%;
   }
 
   .raid-frame {
