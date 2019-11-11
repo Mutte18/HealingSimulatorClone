@@ -18,7 +18,6 @@
 </template>
 
 <script>
-import { EventBus } from '../../main';
 import HealthBar from './HealthBar';
 import RaidMemberModel from "./RaidMemberModel";
 
@@ -33,25 +32,6 @@ export default {
     return {};
   },
   components: { 'app-health-bar': HealthBar },
-
-  computed: {
-
-  },
-  methods: {
-    getTargeted() {
-      // return this.isTargeted;
-    },
-    setTargeted() {
-      // this.isTargeted = !this.isTargeted;
-    },
-  },
-  created() {
-    EventBus.$on('setTarget', (event) => {
-      console.log(event);
-
-      //this.setTargeted();
-    });
-  },
 };
 </script>
 

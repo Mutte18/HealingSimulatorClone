@@ -10,7 +10,8 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "lint": "eslint --max-warnings 0 --ext .js,.vue .",
     "lint_fix": "eslint --fix --ext .js,.vue .",
-    "test": "jest"
+    "test": "jest --coverage",
+    "update_snapshots": "jest --updateSnapshot"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -21,7 +22,8 @@
     "transform": {
       ".*\\.(vue)$": "vue-jest",
       "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
-    }
+    },
+    "snapshotSerializers": ["jest-serializer-vue"]
   },
   "dependencies": {
     "node-sass": "^4.12.0",
@@ -50,6 +52,7 @@
     "eslint-plugin-vue": "^5.2.3",
     "file-loader": "^1.1.4",
     "jest": "^24.9.0",
+    "jest-serializer-vue": "^2.0.2",
     "vue-jest": "^3.0.5",
     "vue-loader": "^13.0.5",
     "vue-template-compiler": "^2.4.4",

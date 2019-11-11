@@ -44,7 +44,7 @@ export default {
     },
   },
   computed: {
-    getHealthPointStyle() {
+    /*getHealthPointStyle() {
       let backgroundColor = '';
       if (this.getHealthPercentage() > 75) {
         backgroundColor = 'green';
@@ -59,7 +59,7 @@ export default {
         backgroundColor,
         width: `${this.getHealthPercentage()}%`,
       };
-    },
+    },*/
     getClassHealthbars() {
       let backgroundColor = '';
       switch (this.classification) {
