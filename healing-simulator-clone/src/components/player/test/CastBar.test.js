@@ -41,7 +41,12 @@ test('renders correctly', () => {
 
 test('starts spellCast on event received', () => {
   const startSpellCast = jest.fn();
-  wrapper.vm.$bus.$emit('startSpellCast');
-  const kalle = expect(wrapper.vm.$bus.emitted('startSpellCast').toBeTruthy());
+  wrapper.vm.setMethods(startSpellCast);
+  wrapper.vm.startSpellCast(1000);
+  expect(wrapper.vm.startSpellCast).toBeCalled();
+
+  wrapper.vm.$emit('startSpellCast');
+  /*wrapper.vm.$bus.$emit('startSpellCast');
+  const kalle = expect(wrapper.vm.$bus.emitted('startSpellCast').toBeTruthy());*/
   let peter = "hej";
 })
