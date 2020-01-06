@@ -3,7 +3,10 @@ import App from './App.vue';
 
 export const EventBus = new Vue();
 
-new Vue({
-  el: '#app',
-  render: (h) => h(App),
+document.addEventListener('DOMContentLoaded', () => {
+  const el = document.body.appendChild(document.createElement('app'))
+  const app = new Vue({
+    el,
+    render: h => h(App)
+  })
 });
