@@ -6,3 +6,5 @@ export const ErrorMessages = {
   OnCooldown: 'Spell is still on cooldown',
   GameOver: 'GAME OVER - PRESS [X] To try again!'
 };
+
+

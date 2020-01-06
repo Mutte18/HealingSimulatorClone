@@ -180,24 +180,7 @@ export default {
         }
       }
     },
-    getErrorMessageReason(target, spellObject, playerSpell, playerMana){
-      if (!target){
-        return ErrorMessages.NoTarget;
-      }
-      else if (!target.getIsAlive()){
-        return ErrorMessages.TargetNotAlive;
-      }
-      else if (!SpellLogic.checkIfEnoughManaForCast(playerMana, spellObject.getManaCost()))
-      {
-        return ErrorMessages.NotEnoughMana;
-      }
-      else if (playerSpell.internalCooldownActive) {
-        return ErrorMessages.OnCooldown;
-      }
-      else {
-        return null;
-      }
-    },
+
 
     setErrorMessage(errorMessage) {
       if (errorMessage) {
@@ -207,11 +190,11 @@ export default {
           this.errorMessageActive = true;
           if(!this.gameOver) {
             this.errorMessageTimeout = setTimeout(() => {
-            window.clearTimeout(this.errorMessageTimeout);
-            this.errorMessageActive = false;
-          }, 1500);
+              window.clearTimeout(this.errorMessageTimeout);
+              this.errorMessageActive = false;
+            }, 1500);
+          }
         }
-      }
     },
 
     startInternalCooldown() {

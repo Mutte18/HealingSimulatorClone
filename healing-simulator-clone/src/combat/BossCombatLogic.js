@@ -1,6 +1,6 @@
 import { classifications } from '../raiderClassifications';
 import { ArrayHelper } from '../Helpers/ArrayHelper';
-import {RaiderHelper} from "../components/raider/RaiderHelper";
+import { RaiderHelper } from "../components/raider/RaiderHelper";
 
 export const BossCombatLogic = {
   bossNormalAttack(raidMembers, boss) {
