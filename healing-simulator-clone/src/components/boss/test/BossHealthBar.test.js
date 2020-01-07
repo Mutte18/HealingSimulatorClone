@@ -1,22 +1,28 @@
 import { shallowMount } from "@vue/test-utils";
 import BossHealthBar from '../BossHealthBar.vue';
 
-let wrapper;
-
-beforeEach(() => {
-  wrapper = shallowMount(BossHealthBar, {
+const factory = (propsData) => {
+  return shallowMount(BossHealthBar, {
     propsData: {
-      healthPoints: 100,
       maxHealth: 100,
-      bossName: 'test'
+      bossName: 'test',
+      ...propsData
     }
-  });
-});
+  })
+};
 
-afterEach(() => {
-  wrapper.destroy();
-});
+
 
 test('renders correctly', () => {
+  const wrapper = factory({
+    healthPoints: 100,
+  });
   expect(wrapper).toMatchSnapshot();
 });
+
+test('getHealthPointStyle with 0 hp', () => {
+  const wrapper = factory({
+    healthPoints: 0,
+  });
+  expect(wrapper).toMatchSnapshot();
+})

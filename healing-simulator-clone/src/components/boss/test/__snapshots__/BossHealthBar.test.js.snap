@@ -1,5 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`getHealthPointStyle with 0 hp 1`] = `
+VueWrapper {
+  "_emitted": Object {},
+  "_emittedByOrder": Array [],
+  "isFunctionalComponent": undefined,
+}
+`;
+
 exports[`renders correctly 1`] = `
 VueWrapper {
   "_emitted": Object {},

@@ -28,9 +28,6 @@ export default {
       required: true
     }
   },
-  data() {
-    return {};
-  },
   components: { 'app-health-bar': HealthBar },
 };
 </script>

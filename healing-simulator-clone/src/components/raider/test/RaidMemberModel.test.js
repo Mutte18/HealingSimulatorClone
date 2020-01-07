@@ -78,5 +78,9 @@ test('set has bossAggro', () => {
   expect(raidMember.getHasBossAggro()).toBe(true);
 });
 
+test('create empty RaidMemberModel', () => {
+  const emptyRaidMember = new RaidMemberModel();
+});
+
 
 

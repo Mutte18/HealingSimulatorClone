@@ -14,7 +14,7 @@ module.exports = {
     '^.+\\.js$': '<rootDir>/node_modules/babel-jest',
     '.*\\.(vue)$': '<rootDir>/node_modules/vue-jest'
   },
-  coverageDirectory: '<rootDir>/test/unit/coverage',
+  coverageDirectory: '<rootDir>/testCoverage',
   collectCoverageFrom: [
     'src/**/*.{js,vue}',
     '!src/main.js',

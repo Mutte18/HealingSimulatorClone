@@ -34,10 +34,6 @@ export default {
       required: true
     },
   },
-  data() {
-    return {
-    };
-  },
   components: {
     'app-boss-info': BossInfo,
     'app-boss-health-bar': BossHealthBar,
